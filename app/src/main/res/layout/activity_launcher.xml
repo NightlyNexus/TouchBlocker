@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+  <com.nightlynexus.touchblocker.ExtendedToolbar
+      android:layout_width="match_parent"
+      android:layout_height="?actionBarSize"
+      android:background="@color/toolbar_background"
+      app:title="@string/toolbar_title"
+      app:titleTextColor="@color/toolbar_title" />
+
+  <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="@drawable/toolbar_shadow_background" />
+
+    <ImageView
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/buttons"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:contentDescription="@string/brand_icon_content_description"
+        android:src="@drawable/brand_icon" />
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+      <Button
+          android:id="@+id/enable"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginBottom="32dp"
+          android:backgroundTint="@color/enable_button_background_tint"
+          android:minWidth="192dp"
+          android:padding="24dp"
+          android:textAllCaps="false"
+          android:textColor="@color/enable_button_text"
+          android:textSize="24sp"
+          android:theme="@style/EnableButton" />
+
+      <CheckBox
+          android:id="@+id/keep_screen_on"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:gravity="center"
+          android:text="@string/keep_screen_on"
+          android:textSize="18sp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/footer"
+        android:textSize="16sp" />
+  </RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dialog_permission_background"
+    android:orientation="vertical">
+
+  <ScrollView
+      android:layout_width="wrap_content"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:clipToPadding="false"
+      android:paddingHorizontal="32dp"
+      android:paddingVertical="24dp"
+      android:scrollbarStyle="insideInset">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_permission_explanation"
+        android:textSize="20sp" />
+  </ScrollView>
+
+  <View
+      android:layout_width="match_parent"
+      android:layout_height="1dp"
+      android:background="?android:textColorTertiary" />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/dialog_permission_button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="?selectableItemBackground"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:text="@string/dialog_permission_button_cancel"
+        android:textColor="@color/dialog_permission_button_text"
+        android:textSize="24sp" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="?android:textColorTertiary" />
+
+    <!-- wrap_content height on this View
+    because it will always have the maximum height over its siblings. -->
+    <TextView
+        android:id="@+id/dialog_permission_button_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="@string/dialog_permission_button_confirm"
+        android:textColor="@color/dialog_permission_button_text"
+        android:textSize="24sp" />
+  </LinearLayout>
+</LinearLayout>

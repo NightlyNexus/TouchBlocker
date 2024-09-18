@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+  <issue id="ConvertToWebp" severity="error" />
+  <issue id="IconExpectedSize" severity="error" />
+  <issue id="InvalidPackage">
+    <ignore regexp=".*okio.*" />
+    <ignore regexp=".*retrofit.*" />
+  </issue>
+  <issue id="MangledCRLF" severity="error" />
+  <!-- TODO: Remove: https://issuetracker.google.com/issues/63610357 -->
+  <issue id="MissingRegistered" severity="error" />
+  <!-- TODO: Remove: https://issuetracker.google.com/issues/63610357 -->
+  <issue id="Registered" severity="fatal" />
+  <issue id="StopShip" severity="error" />
+  <issue id="TypographyQuotes" severity="error" />
+</lint>

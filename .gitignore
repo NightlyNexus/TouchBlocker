@@ -1,0 +1,13 @@
+# IntelliJ IDEA
+.idea
+*.iml
+
+# Gradle
+.gradle
+build
+local.properties
+
+lint-reports
+
+# Mac OS
+.DS_Store

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal|bottom"
+    android:layout_marginLeft="64dp"
+    android:layout_marginRight="64dp"
+    android:layout_marginBottom="@dimen/lock_background_toast_margin_bottom"
+    android:background="@drawable/lock_background_toast_background"
+    android:gravity="center_horizontal"
+    android:lineSpacingMultiplier="1.2"
+    android:padding="16dp"
+    android:text="@string/lock_background_toast"
+    android:textColor="@color/lock_background_toast_text"
+    android:textSize="20sp" />

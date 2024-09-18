@@ -1,0 +1,3 @@
+rootProject.name = "TouchBlocker"
+include ':app'
+include ':featureunlocker'

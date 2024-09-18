@@ -1,0 +1,52 @@
+plugins {
+  id 'com.android.library'
+  id 'org.jetbrains.kotlin.android'
+}
+
+android {
+  namespace 'com.nightlynexus.featureunlocker'
+
+  compileSdkVersion versions.compileSdk
+
+  defaultConfig {
+    minSdk 26
+  }
+
+  buildTypes {
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  kotlinOptions {
+    jvmTarget = '1.8'
+  }
+
+  lint {
+    abortOnError true
+    warningsAsErrors true
+    lintConfig rootProject.file('lint.xml')
+    textReport true
+    htmlReport true
+    htmlOutput rootProject.file("lint-reports/${name}.html")
+    // We run a full lint analysis as build part in CI, so skip vital checks for assemble tasks.
+    checkReleaseBuilds false
+  }
+}
+
+dependencies {
+  implementation deps.billing
+  api deps.kotlin.stdlibJdk8
+  implementation deps.kotlin.coroutines
+  implementation deps.androidx.activity
+  implementation deps.androidx.annotations
+  implementation deps.androidx.collection
+  implementation deps.androidx.core
+  implementation deps.androidx.fragment
+  implementation deps.androidx.lifecycleLivedataCore
+  implementation deps.androidx.lifecycleRuntime
+  implementation deps.androidx.lifecycleViewmodel
+  implementation deps.androidx.savedstate
+}

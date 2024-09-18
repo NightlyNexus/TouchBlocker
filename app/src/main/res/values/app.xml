@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Touch Blocker</string>
+
+  <string name="accessibility_service_label">@string/app_name</string>
+  <string name="accessibility_service_description">Touch Blocker needs this permission to create a transparent overlay to intercept screen touches. Touch Blocker does nothing else with accessibility features.</string>
+  <string name="accessibility_service_intro">Let Touch Blocker use a screen overlay to block touches</string>
+  <string name="accessibility_service_summary">Block touches</string>
+</resources>

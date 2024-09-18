@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="lock_content_description_unlocked">Lock</string>
+  <string name="lock_content_description_locked">Unlock</string>
+  <string name="lock_background_toast">To unhide the unlock\u00A0button,\n<b>double tap</b> the screen</string>
+
+  <color name="lock_background">#88224488</color>
+  <color name="lock_background_ripple">#FFFFFF</color>
+  <color name="lock_background_toast_background">@color/window_background</color>
+  <color name="lock_background_toast_background_stroke">#FFFFFF</color>
+  <color name="lock_background_toast_text">#FFFFFF</color>
+
+  <dimen name="lock_width">80dp</dimen>
+  <dimen name="lock_height">80dp</dimen>
+  <dimen name="lock_padding">16dp</dimen>
+  <dimen name="max_move_distance_for_click">4dp</dimen>
+  <dimen name="max_out_of_screen_bounds">16dp</dimen>
+  <dimen name="lock_animate_dips_per_second">256dp</dimen>
+  <dimen name="lock_background_toast_margin_bottom">128dp</dimen>
+</resources>
