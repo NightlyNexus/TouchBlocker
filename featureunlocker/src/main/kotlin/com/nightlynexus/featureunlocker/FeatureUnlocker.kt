@@ -30,16 +30,18 @@ internal class PlayFeatureUnlocker(
   override var state = FeatureUnlocker.State.Loading
     get() {
       if (!Looper.getMainLooper().isCurrentThread) {
+        val currentThread = Thread.currentThread().toString()
         scope.launch(Dispatchers.Main) {
-          throw IllegalStateException(Thread.currentThread().toString())
+          throw IllegalStateException(currentThread)
         }
       }
       return field
     }
     private set(value) {
       if (!Looper.getMainLooper().isCurrentThread) {
+        val currentThread = Thread.currentThread().toString()
         scope.launch(Dispatchers.Main) {
-          throw IllegalStateException(Thread.currentThread().toString())
+          throw IllegalStateException(currentThread)
         }
       }
       field = value
