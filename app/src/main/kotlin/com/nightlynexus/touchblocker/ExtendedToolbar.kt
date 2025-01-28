@@ -11,16 +11,25 @@ internal class ExtendedToolbar(
   context: Context,
   attributes: AttributeSet
 ) : Toolbar(context, attributes) {
-  private var extraHeight = 0
+  private var insetTop = 0
+  private var insetLeft = 0
+  private var insetRight = 0
   private var initialHeight = 0
-  private var initialPadding = 0
+  private var initialPaddingTop = 0
+  private var initialPaddingLeft = 0
+  private var initialPaddingRight = 0
   private var initialMeasure = true
 
   override fun onApplyWindowInsets(insets: WindowInsets): WindowInsets {
-    extraHeight = if (SDK_INT >= 30) {
-      insets.getInsets(WindowInsets.Type.systemBars()).top
+    if (SDK_INT >= 30) {
+      val systemBarsInsets = insets.getInsets(WindowInsets.Type.systemBars())
+      insetTop = systemBarsInsets.top
+      insetLeft = systemBarsInsets.left
+      insetRight = systemBarsInsets.right
     } else {
-      @Suppress("Deprecation") insets.systemWindowInsetTop
+      insetTop = @Suppress("Deprecation") insets.systemWindowInsetTop
+      insetLeft = @Suppress("Deprecation") insets.systemWindowInsetLeft
+      insetRight = @Suppress("Deprecation") insets.systemWindowInsetRight
     }
     return super.onApplyWindowInsets(insets)
   }
@@ -32,13 +41,20 @@ internal class ExtendedToolbar(
     if (initialMeasure) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
       initialHeight = measuredHeight
-      initialPadding = paddingTop
+      initialPaddingTop = paddingTop
+      initialPaddingLeft = paddingLeft
+      initialPaddingRight = paddingRight
       initialMeasure = false
     } else {
       super.onMeasure(
-        widthMeasureSpec, MeasureSpec.makeMeasureSpec(initialHeight + extraHeight, EXACTLY)
+        widthMeasureSpec, MeasureSpec.makeMeasureSpec(initialHeight + insetTop, EXACTLY)
       )
-      setPadding(paddingLeft, initialPadding + extraHeight, paddingRight, paddingBottom)
+      setPadding(
+        initialPaddingLeft + insetLeft,
+        initialPaddingTop + insetTop,
+        initialPaddingRight + insetRight,
+        paddingBottom
+      )
     }
   }
 
