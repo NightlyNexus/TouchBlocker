@@ -22,6 +22,7 @@
         android:background="@drawable/toolbar_shadow_background" />
 
     <ImageView
+        android:id="@+id/brand_icon"
         android:layout_width="256dp"
         android:layout_height="wrap_content"
         android:layout_above="@id/buttons_container"

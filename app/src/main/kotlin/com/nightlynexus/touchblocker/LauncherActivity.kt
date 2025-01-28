@@ -3,6 +3,7 @@ package com.nightlynexus.touchblocker
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -18,6 +19,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
   private lateinit var keepScreenOnStatus: KeepScreenOnStatus
   private lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   private lateinit var featureUnlocker: FeatureUnlocker
+  private lateinit var brandIcon: View
   private lateinit var enableButton: TextView
   private lateinit var keepScreenOnCheckBox: CompoundButton
   private lateinit var assistantCheckBox: CompoundButton
@@ -33,6 +35,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
 
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_launcher)
+    brandIcon = findViewById(R.id.brand_icon)
     enableButton = findViewById(R.id.enable)
     keepScreenOnCheckBox = findViewById(R.id.keep_screen_on)
     assistantCheckBox = findViewById(R.id.enable_assistant)
@@ -42,6 +45,11 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
       onFloatingViewRemoved()
     } else {
       onFloatingViewPermissionRevoked()
+    }
+    brandIcon.visibility = if (resources.configuration.orientation == ORIENTATION_PORTRAIT) {
+      View.VISIBLE
+    } else {
+      View.GONE
     }
     keepScreenOnCheckBox.isChecked = keepScreenOnStatus.getKeepScreenOn()
     keepScreenOnCheckBox.setOnCheckedChangeListener { _, isChecked ->
