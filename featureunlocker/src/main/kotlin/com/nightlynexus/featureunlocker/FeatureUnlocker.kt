@@ -212,7 +212,7 @@ internal class PlayFeatureUnlocker(
   private var pendingBuy: WeakReference<Activity>? = null
 
   override fun buy(activity: Activity) {
-    if (pendingBuy != null) {
+    if (pendingBuy?.get() != null) {
       throw IllegalStateException("Already pending a buy.")
     }
     when (state) {
