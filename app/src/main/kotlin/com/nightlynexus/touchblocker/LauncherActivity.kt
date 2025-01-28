@@ -99,7 +99,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
   }
 
   private fun showPermissionDialog() {
-    val alertDialog = AlertDialog.Builder(this)
+    val alertDialog = AlertDialog.Builder(this, R.style.DialogPermissionStyle)
       .setView(R.layout.dialog_permission)
       .show()
     alertDialog.findViewById<View>(R.id.dialog_permission_button_confirm)!!.setOnClickListener {

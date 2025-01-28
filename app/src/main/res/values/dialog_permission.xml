@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <style name="DialogPermissionStyle" parent="ThemeOverlay.MaterialComponents.Dialog.Alert.Framework">
+    <item name="android:background">@color/dialog_permission_background</item>
+  </style>
+
   <string name="dialog_permission_explanation">Touch Blocker uses the Accessibility APIs in Android to display a screen overlay to intercept touches when you enable Touch Blocker.\n\nYou will need to go to the system settings to grant Touch Blocker this permission.\n\nTouch Blocker does not collect or store any data and only uses this permission to display the overlay as necessary to function.</string>
   <string name="dialog_permission_button_cancel">Cancel</string>
   <string name="dialog_permission_button_confirm">Click to go to settings to\ngrant permission</string>
