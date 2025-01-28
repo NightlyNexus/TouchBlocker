@@ -63,6 +63,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="32dp"
             android:gravity="center"
+            android:paddingHorizontal="8dp"
             android:text="@string/keep_screen_on"
             android:textSize="18sp" />
 
@@ -72,6 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:gravity="center"
+            android:paddingHorizontal="8dp"
             android:text="@string/enable_assistant"
             android:textSize="16sp" />
       </LinearLayout>
