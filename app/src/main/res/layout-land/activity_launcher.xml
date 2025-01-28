@@ -31,7 +31,6 @@
           android:id="@+id/buttons"
           android:layout_width="256dp"
           android:layout_height="wrap_content"
-          android:animateLayoutChanges="true"
           android:orientation="vertical">
 
         <Button
@@ -58,18 +57,14 @@
             android:text="@string/keep_screen_on"
             android:textSize="18sp" />
 
-        <Button
+        <com.nightlynexus.touchblocker.NontoggleableCheckBox
             android:id="@+id/enable_assistant"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:backgroundTint="@color/enable_assistant_button_background_tint"
-            android:padding="16dp"
-            android:text="@string/enable_assistant_button"
-            android:textAllCaps="false"
-            android:textColor="@color/enable_assistant_button_text"
-            android:textSize="16sp"
-            android:theme="@style/EnableAssistantButton" />
+            android:gravity="center"
+            android:text="@string/enable_assistant"
+            android:textSize="16sp" />
       </LinearLayout>
     </ScrollView>
 
