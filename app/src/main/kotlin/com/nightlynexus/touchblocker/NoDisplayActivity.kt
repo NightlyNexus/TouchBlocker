@@ -14,9 +14,13 @@ class NoDisplayActivity : Activity() {
     if (floatingViewStatus.permissionGranted) {
       floatingViewStatus.toggle()
     } else {
-      startActivity(accessibilityServicesSettingsIntent().apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-      })
+      startActivity(
+        accessibilityServicesSettingsIntent().addFlags(
+          Intent.FLAG_ACTIVITY_NEW_TASK or
+            Intent.FLAG_ACTIVITY_CLEAR_TOP or
+            Intent.FLAG_ACTIVITY_SINGLE_TOP
+        )
+      )
     }
     finish()
   }

@@ -121,9 +121,13 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
 
   private fun requestPermission() {
     accessibilityPermissionRequestTracker.recordAccessibilityPermissionRequest()
-    startActivity(accessibilityServicesSettingsIntent().apply {
-      flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    })
+    startActivity(
+      accessibilityServicesSettingsIntent().addFlags(
+        Intent.FLAG_ACTIVITY_NEW_TASK or
+          Intent.FLAG_ACTIVITY_CLEAR_TOP or
+          Intent.FLAG_ACTIVITY_SINGLE_TOP
+      )
+    )
   }
 
   override fun onToggle() {
