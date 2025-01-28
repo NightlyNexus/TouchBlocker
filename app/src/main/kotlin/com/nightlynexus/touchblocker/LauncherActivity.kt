@@ -19,8 +19,8 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
   private lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   private lateinit var featureUnlocker: FeatureUnlocker
   private lateinit var enableButton: TextView
-  private lateinit var keepScreenOnCheckbox: CompoundButton
-  private lateinit var assistantCheckbox: CompoundButton
+  private lateinit var keepScreenOnCheckBox: CompoundButton
+  private lateinit var assistantCheckBox: CompoundButton
 
   override fun onCreate(savedInstanceState: Bundle?) {
     val application = application as TouchBlockerApplication
@@ -34,8 +34,8 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_launcher)
     enableButton = findViewById(R.id.enable)
-    keepScreenOnCheckbox = findViewById(R.id.keep_screen_on)
-    assistantCheckbox = findViewById(R.id.enable_assistant)
+    keepScreenOnCheckBox = findViewById(R.id.keep_screen_on)
+    assistantCheckBox = findViewById(R.id.enable_assistant)
     if (floatingViewStatus.added) {
       onFloatingViewAdded()
     } else if (floatingViewStatus.permissionGranted) {
@@ -43,9 +43,9 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
     } else {
       onFloatingViewPermissionRevoked()
     }
-    keepScreenOnCheckbox.isChecked = keepScreenOnStatus.getKeepScreenOn()
-    keepScreenOnCheckbox.setOnCheckedChangeListener { _, isChecked ->
-      if (keepScreenOnCheckbox.tag != null) {
+    keepScreenOnCheckBox.isChecked = keepScreenOnStatus.getKeepScreenOn()
+    keepScreenOnCheckBox.setOnCheckedChangeListener { _, isChecked ->
+      if (keepScreenOnCheckBox.tag != null) {
         return@setOnCheckedChangeListener
       }
       if (featureUnlocker.state != FeatureUnlocker.State.Purchased) {
@@ -55,10 +55,10 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
         keepScreenOnStatus.setKeepScreenOn(isChecked)
       }
     }
-    assistantCheckbox.isChecked = isDefaultAssistant()
-    assistantCheckbox.setOnClickListener {
+    assistantCheckBox.isChecked = isDefaultAssistant()
+    assistantCheckBox.setOnClickListener {
       startActivity(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS))
-      @StringRes val toastMessageResource = if (assistantCheckbox.isChecked) {
+      @StringRes val toastMessageResource = if (assistantCheckBox.isChecked) {
         R.string.enable_assistant_toast_disable
       } else {
         R.string.enable_assistant_toast
@@ -127,16 +127,16 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
   }
 
   private fun setKeepScreenOnCheckboxCheckedWithoutCallingListener(checked: Boolean) {
-    keepScreenOnCheckbox.tag = true
-    keepScreenOnCheckbox.isChecked = checked
-    keepScreenOnCheckbox.tag = null
+    keepScreenOnCheckBox.tag = true
+    keepScreenOnCheckBox.isChecked = checked
+    keepScreenOnCheckBox.tag = null
   }
 
   override fun onResume() {
     super.onResume()
     // I do not know of a broadcast to know exactly when the default assistant app changed,
     // so I will check in onResume.
-    assistantCheckbox.isChecked = isDefaultAssistant()
+    assistantCheckBox.isChecked = isDefaultAssistant()
   }
 
   private fun isDefaultAssistant(): Boolean {
