@@ -21,36 +21,57 @@
         android:layout_height="8dp"
         android:background="@drawable/toolbar_shadow_background" />
 
-    <LinearLayout
-        android:id="@+id/buttons"
-        android:layout_width="256dp"
+    <ScrollView
+        android:id="@+id/buttons_container"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="vertical">
+        android:layout_centerInParent="true">
 
-      <Button
-          android:id="@+id/enable"
-          android:layout_width="wrap_content"
+      <LinearLayout
+          android:id="@+id/buttons"
+          android:layout_width="256dp"
           android:layout_height="wrap_content"
-          android:layout_gravity="center_horizontal"
-          android:layout_marginBottom="32dp"
-          android:backgroundTint="@color/enable_button_background_tint"
-          android:minWidth="192dp"
-          android:padding="24dp"
-          android:textAllCaps="false"
-          android:textColor="@color/enable_button_text"
-          android:textSize="24sp"
-          android:theme="@style/EnableButton" />
+          android:animateLayoutChanges="true"
+          android:orientation="vertical">
 
-      <CheckBox
-          android:id="@+id/keep_screen_on"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_gravity="center_horizontal"
-          android:gravity="center"
-          android:text="@string/keep_screen_on"
-          android:textSize="18sp" />
-    </LinearLayout>
+        <Button
+            android:id="@+id/enable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="32dp"
+            android:backgroundTint="@color/enable_button_background_tint"
+            android:minWidth="192dp"
+            android:padding="24dp"
+            android:textAllCaps="false"
+            android:textColor="@color/enable_button_text"
+            android:textSize="24sp"
+            android:theme="@style/EnableButton" />
+
+        <CheckBox
+            android:id="@+id/keep_screen_on"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="32dp"
+            android:gravity="center"
+            android:text="@string/keep_screen_on"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/enable_assistant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="@color/enable_assistant_button_background_tint"
+            android:padding="16dp"
+            android:text="@string/enable_assistant_button"
+            android:textAllCaps="false"
+            android:textColor="@color/enable_assistant_button_text"
+            android:textSize="16sp"
+            android:theme="@style/EnableAssistantButton" />
+      </LinearLayout>
+    </ScrollView>
 
     <TextView
         android:layout_width="wrap_content"

@@ -4,9 +4,11 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.nightlynexus.featureunlocker.FeatureUnlocker
 
@@ -17,6 +19,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
   private lateinit var featureUnlocker: FeatureUnlocker
   private lateinit var enableButton: TextView
   private lateinit var keepScreenOnCheckbox: CompoundButton
+  private lateinit var enableAssistantButton: View
 
   override fun onCreate(savedInstanceState: Bundle?) {
     val application = application as TouchBlockerApplication
@@ -31,12 +34,18 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
     setContentView(R.layout.activity_launcher)
     enableButton = findViewById(R.id.enable)
     keepScreenOnCheckbox = findViewById(R.id.keep_screen_on)
+    enableAssistantButton = findViewById(R.id.enable_assistant)
     if (floatingViewStatus.added) {
       onFloatingViewAdded()
     } else if (floatingViewStatus.permissionGranted) {
       onFloatingViewRemoved()
     } else {
       onFloatingViewPermissionRevoked()
+    }
+    if (floatingViewStatus.permissionGranted && !isDefaultAssistant()) {
+      enableAssistantButton.visibility = View.VISIBLE
+    } else {
+      enableAssistantButton.visibility = View.GONE
     }
     keepScreenOnCheckbox.isChecked = keepScreenOnStatus.getKeepScreenOn()
     keepScreenOnCheckbox.setOnCheckedChangeListener { _, isChecked ->
@@ -51,6 +60,10 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
       }
     }
     floatingViewStatus.addListener(this)
+    enableAssistantButton.setOnClickListener {
+      startActivity(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS))
+      Toast.makeText(this, R.string.enable_assistant_toast, Toast.LENGTH_LONG).show()
+    }
   }
 
   override fun onDestroy() {
@@ -74,6 +87,9 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
 
   override fun onFloatingViewPermissionGranted() {
     onFloatingViewRemoved()
+    if (!isDefaultAssistant()) {
+      enableAssistantButton.visibility = View.VISIBLE
+    }
   }
 
   override fun onFloatingViewPermissionRevoked() {
@@ -81,6 +97,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
     enableButton.setOnClickListener {
       showPermissionDialog()
     }
+    enableAssistantButton.visibility = View.GONE
   }
 
   private fun showPermissionDialog() {
@@ -115,5 +132,22 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
     keepScreenOnCheckbox.tag = true
     keepScreenOnCheckbox.isChecked = checked
     keepScreenOnCheckbox.tag = null
+  }
+
+  override fun onResume() {
+    super.onResume()
+    if (floatingViewStatus.permissionGranted) {
+      if (isDefaultAssistant()) {
+        enableAssistantButton.visibility = View.GONE
+      } else {
+        enableAssistantButton.visibility = View.VISIBLE
+      }
+    }
+  }
+
+  private fun isDefaultAssistant(): Boolean {
+    // This only takes a millisecond or two on my Pixel 6.
+    val assistant = Settings.Secure.getString(contentResolver, "assistant")
+    return assistant == "$packageName/${NoDisplayActivity::class.qualifiedName}"
   }
 }

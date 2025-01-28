@@ -18,10 +18,16 @@
     <item name="colorControlHighlight">@color/enable_button_ripple</item>
   </style>
 
+  <style name="EnableAssistantButton">
+    <item name="colorControlHighlight">@color/enable_assistant_button_ripple</item>
+  </style>
+
   <string name="toolbar_title">@string/app_name</string>
   <string name="enable_button_accessibility_service">Grant permission\nfor screen overlay</string>
   <string name="enable_button_add_floating">Enable</string>
   <string name="enable_button_remove_floating">Remove for now</string>
+  <string name="enable_assistant_button">Optional: Toggle touch blocking by long-pressing the power button</string>
+  <string name="enable_assistant_toast">Set Touch Blocker as the default assistant app</string>
   <string name="keep_screen_on"><b>Premium Feature</b>\nKeep screen on\nwhile blocking touches</string>
   <string name="brand_icon_content_description">Touch Blocker icon</string>
   <string name="footer">An app by Eric Cochran</string>
@@ -34,4 +40,7 @@
   <color name="enable_button_background_tint">@color/accent</color>
   <color name="enable_button_ripple">@color/window_background</color>
   <color name="enable_button_text">#FFFFFF</color>
+  <color name="enable_assistant_button_background_tint">@color/primary</color>
+  <color name="enable_assistant_button_ripple">@color/window_background</color>
+  <color name="enable_assistant_button_text">#FFFFFF</color>
 </resources>
