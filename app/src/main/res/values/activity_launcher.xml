@@ -8,7 +8,6 @@
   </style>
 
   <style name="Launcher" parent="Theme.Material3.Dark.NoActionBar">
-    <item name="android:windowTranslucentStatus">true</item>
     <item name="colorPrimary">@color/primary</item>
     <item name="colorAccent">@color/accent</item>
     <item name="android:windowBackground">@color/window_background</item>
@@ -18,7 +17,6 @@
     <item name="colorControlHighlight">@color/enable_button_ripple</item>
   </style>
 
-  <string name="toolbar_title">@string/app_name</string>
   <string name="enable_button_accessibility_service">Grant permission\nfor screen overlay</string>
   <string name="enable_button_add_floating">Enable</string>
   <string name="enable_button_remove_floating">Remove for now</string>
@@ -29,11 +27,9 @@
   <string name="brand_icon_content_description">Touch Blocker icon</string>
   <string name="footer">An app by Eric Cochran</string>
 
-  <color name="primary">#224488</color>
+  <color name="primary">#111133</color>
   <color name="accent">#4499FF</color>
-  <color name="window_background">#111133</color>
-  <color name="toolbar_background">@color/primary</color>
-  <color name="toolbar_title">#FFFFFF</color>
+  <color name="window_background">@color/primary</color>
   <color name="enable_button_background_tint">@color/accent</color>
   <color name="enable_button_ripple">@color/window_background</color>
   <color name="enable_button_text">#FFFFFF</color>
