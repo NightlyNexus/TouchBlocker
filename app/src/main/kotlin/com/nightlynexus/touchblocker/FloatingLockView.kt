@@ -277,7 +277,6 @@ internal class FloatingLockView(
         }
       }
       val oldAlpha = alpha
-      alpha = coercedAlpha
       if (oldAlpha == coercedAlpha) {
         // The delta was too small on this draw pass.
         needsInvalidate = true
