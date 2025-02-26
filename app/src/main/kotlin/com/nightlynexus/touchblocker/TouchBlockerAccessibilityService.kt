@@ -79,7 +79,9 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
       val bounds = currentWindowMetrics.bounds
       width = bounds.width()
       height = bounds.height()
-      val insets = currentWindowMetrics.windowInsets.getInsets(WindowInsets.Type.systemBars())
+      val insets = currentWindowMetrics.windowInsets.getInsets(
+        WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout()
+      )
       insetLeft = insets.left
       insetRight = insets.right
       insetTop = insets.top
@@ -339,7 +341,9 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
       val bounds = currentWindowMetrics.bounds
       width = bounds.width()
       height = bounds.height()
-      val insets = currentWindowMetrics.windowInsets.getInsets(WindowInsets.Type.systemBars())
+      val insets = currentWindowMetrics.windowInsets.getInsets(
+        WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout()
+      )
       insetLeft = insets.left
       insetRight = insets.right
       insetTop = insets.top
