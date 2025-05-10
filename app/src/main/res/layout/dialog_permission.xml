@@ -23,7 +23,7 @@
   <View
       android:layout_width="match_parent"
       android:layout_height="1dp"
-      android:background="?android:textColorTertiary" />
+      android:background="@drawable/text_color_tertiary_shape" />
 
   <LinearLayout
       android:layout_width="match_parent"
@@ -44,7 +44,7 @@
     <View
         android:layout_width="1dp"
         android:layout_height="match_parent"
-        android:background="?android:textColorTertiary" />
+        android:background="@drawable/text_color_tertiary_shape" />
 
     <!-- wrap_content height on this View
     because it will always have the maximum height over its siblings. -->
