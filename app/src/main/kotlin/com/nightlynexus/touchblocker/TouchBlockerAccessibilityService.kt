@@ -19,9 +19,16 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import androidx.core.content.ContextCompat
 
 class TouchBlockerAccessibilityService : AccessibilityService(),
   FloatingViewStatus.Listener, KeepScreenOnStatus.Listener {
+  private val ACTION_START_BLOCKING_TOUCHES =
+    "com.nightlynexus.touchblocker.ACTION_START_BLOCKING_TOUCHES"
+  private val ACTION_END_BLOCKING_TOUCHES =
+    "com.nightlynexus.touchblocker.ACTION_END_BLOCKING_TOUCHES"
+  private val ACTION_TOGGLE_BLOCKING_TOUCHES =
+    "com.nightlynexus.touchblocker.ACTION_TOGGLE_BLOCKING_TOUCHES"
   private val lockAnimateAlphaDelayMillis = 2000L
   private val lockAnimateAlphaPerSecond = 3f
   private val backgroundToastFadeInDurationMillis = 1000L
@@ -207,6 +214,25 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
     registerReceiver(unlockedBroadcastReceiver, IntentFilter(Intent.ACTION_USER_PRESENT))
     // TODO: Ensure this works when we have NO keyguard. if not, maybe we check the KeyguardManager.
 
+    ContextCompat.registerReceiver(
+      this,
+      startBlockingTouchesBroadcastReceiver,
+      IntentFilter(ACTION_START_BLOCKING_TOUCHES),
+      ContextCompat.RECEIVER_EXPORTED
+    )
+    ContextCompat.registerReceiver(
+      this,
+      endBlockingTouchesBroadcastReceiver,
+      IntentFilter(ACTION_END_BLOCKING_TOUCHES),
+      ContextCompat.RECEIVER_EXPORTED
+    )
+    ContextCompat.registerReceiver(
+      this,
+      toggleBlockingTouchesBroadcastReceiver,
+      IntentFilter(ACTION_TOGGLE_BLOCKING_TOUCHES),
+      ContextCompat.RECEIVER_EXPORTED
+    )
+
     if (accessibilityPermissionRequestTracker.recentlyLaunchedAccessibilityPermissionRequest()) {
       startActivity(
         Intent(
@@ -245,6 +271,9 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
     unregisterReceiver(screenOffBroadcastReceiver)
     unregisterReceiver(screenOnBroadcastReceiver)
     unregisterReceiver(unlockedBroadcastReceiver)
+    unregisterReceiver(startBlockingTouchesBroadcastReceiver)
+    unregisterReceiver(endBlockingTouchesBroadcastReceiver)
+    unregisterReceiver(toggleBlockingTouchesBroadcastReceiver)
   }
 
   private inner class BackgroundViewOnGestureListener : SimpleOnGestureListener() {
@@ -318,6 +347,48 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
     override fun onReceive(context: Context, intent: Intent) {
       backgroundView.setScreenOn(true)
       lockView.setScreenOn(true)
+    }
+  }
+
+  private val startBlockingTouchesBroadcastReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+      if (floatingViewStatus.added) {
+        if (lockView.locked) {
+          // Already blocking touches.
+        } else {
+          lock()
+          lockView.resetFadeTimer()
+        }
+      } else {
+        if (lockView.locked) {
+          throw IllegalStateException("Not added but locked.")
+        } else {
+          floatingViewStatus.setAdded(true)
+          lock()
+          lockView.resetFadeTimer()
+        }
+      }
+    }
+  }
+
+  private val endBlockingTouchesBroadcastReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+      if (floatingViewStatus.added) {
+        if (lockView.locked) {
+          unlock()
+          floatingViewStatus.setAdded(false)
+        } else {
+          // Already not blocking touches.
+        }
+      } else {
+        // Already not blocking touches.
+      }
+    }
+  }
+
+  private val toggleBlockingTouchesBroadcastReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+      floatingViewStatus.toggle()
     }
   }
 
