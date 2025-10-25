@@ -10,7 +10,7 @@ apply plugin: 'kotlin-android'
 android {
   namespace 'com.nightlynexus.touchblocker'
 
-  compileSdkVersion versions.compileSdk
+  compileSdk versions.compileSdk
 
   defaultConfig {
     applicationId namespace
