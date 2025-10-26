@@ -35,6 +35,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
   private val backgroundToastFadeOutDelayMillis = 4000L
   private val backgroundToastFadeOutDurationMillis = 2500L
 
+  private var connected = false
   private lateinit var floatingViewStatus: FloatingViewStatus
   private lateinit var keepScreenOnStatus: KeepScreenOnStatus
   private lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
@@ -73,6 +74,8 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
   }
 
   override fun onServiceConnected() {
+    connected = true
+
     windowManager = getSystemService(WindowManager::class.java)
 
     val width: Int
@@ -401,6 +404,10 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
+    if (!connected) {
+      return
+    }
+
     val width: Int
     val height: Int
     val insetLeft: Int
