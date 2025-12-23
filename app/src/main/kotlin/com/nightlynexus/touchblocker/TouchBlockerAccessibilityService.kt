@@ -21,8 +21,7 @@ import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.content.ContextCompat
 
-class TouchBlockerAccessibilityService : AccessibilityService(),
-  FloatingViewStatus.Listener, KeepScreenOnStatus.Listener {
+class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewStatus.Listener {
   private val ACTION_START_BLOCKING_TOUCHES =
     "com.nightlynexus.touchblocker.ACTION_START_BLOCKING_TOUCHES"
   private val ACTION_END_BLOCKING_TOUCHES =
@@ -38,6 +37,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
   private var connected = false
   private lateinit var floatingViewStatus: FloatingViewStatus
   private lateinit var keepScreenOnStatus: KeepScreenOnStatus
+  private lateinit var changeScreenBrightnessStatus: ChangeScreenBrightnessStatus
   private lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   private lateinit var windowManager: WindowManager
   private lateinit var backgroundView: FloatingBackgroundView
@@ -49,6 +49,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
     val application = application as TouchBlockerApplication
     floatingViewStatus = application.floatingViewStatus
     keepScreenOnStatus = application.keepScreenOnStatus
+    changeScreenBrightnessStatus = application.changeScreenBrightnessStatus
     accessibilityPermissionRequestTracker = application.accessibilityPermissionRequestTracker
   }
 
@@ -128,6 +129,13 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
     if (keepScreenOnStatus.getKeepScreenOn()) {
       backgroundViewLayoutParams.flags = backgroundViewLayoutParams.flags or
         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+    }
+    backgroundViewLayoutParams.screenBrightness = if (
+      changeScreenBrightnessStatus.getChangeScreenBrightness()
+    ) {
+      WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
+    } else {
+      WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     }
     backgroundView = FloatingBackgroundView(
       this,
@@ -210,7 +218,8 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
     floatingViewStatus.addListener(this)
     floatingViewStatus.setPermissionGranted(true)
 
-    keepScreenOnStatus.addListener(this)
+    keepScreenOnStatus.addListener(keepScreenOnStatusListener)
+    changeScreenBrightnessStatus.addListener(changeScreenBrightnessStatusListener)
 
     registerReceiver(screenOffBroadcastReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
     registerReceiver(screenOnBroadcastReceiver, IntentFilter(Intent.ACTION_SCREEN_ON))
@@ -250,16 +259,37 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
     }
   }
 
-  override fun update(keepScreenOn: Boolean) {
-    backgroundViewLayoutParams.flags = if (keepScreenOn) {
-      backgroundViewLayoutParams.flags or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-    } else {
-      backgroundViewLayoutParams.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON.inv()
+  private val keepScreenOnStatusListener =
+    object : KeepScreenOnStatus.Listener {
+      override fun update(keepScreenOn: Boolean) {
+        backgroundViewLayoutParams.flags = if (
+          keepScreenOn
+        ) {
+          backgroundViewLayoutParams.flags or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        } else {
+          backgroundViewLayoutParams.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON.inv()
+        }
+        if (floatingViewStatus.added) {
+          windowManager.updateViewLayout(backgroundView, backgroundViewLayoutParams)
+        }
+      }
     }
-    if (floatingViewStatus.added) {
-      windowManager.updateViewLayout(backgroundView, backgroundViewLayoutParams)
+
+  private val changeScreenBrightnessStatusListener =
+    object : ChangeScreenBrightnessStatus.Listener {
+      override fun update(changeScreenBrightness: Boolean) {
+        backgroundViewLayoutParams.screenBrightness = if (
+          changeScreenBrightness
+        ) {
+          WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
+        } else {
+          WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        }
+        if (floatingViewStatus.added) {
+          windowManager.updateViewLayout(backgroundView, backgroundViewLayoutParams)
+        }
+      }
     }
-  }
 
   override fun onDestroy() {
     if (lockView.locked) {
@@ -270,7 +300,8 @@ class TouchBlockerAccessibilityService : AccessibilityService(),
     }
     floatingViewStatus.setPermissionGranted(false)
     floatingViewStatus.removeListener(this)
-    keepScreenOnStatus.removeListener(this)
+    keepScreenOnStatus.removeListener(keepScreenOnStatusListener)
+    changeScreenBrightnessStatus.removeListener(changeScreenBrightnessStatusListener)
     unregisterReceiver(screenOffBroadcastReceiver)
     unregisterReceiver(screenOnBroadcastReceiver)
     unregisterReceiver(unlockedBroadcastReceiver)

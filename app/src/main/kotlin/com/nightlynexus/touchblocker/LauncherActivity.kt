@@ -14,20 +14,23 @@ import androidx.annotation.StringRes
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.nightlynexus.featureunlocker.FeatureUnlocker
 
-class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnStatus.Listener {
+class LauncherActivity : Activity(), FloatingViewStatus.Listener {
   private lateinit var floatingViewStatus: FloatingViewStatus
   private lateinit var keepScreenOnStatus: KeepScreenOnStatus
+  private lateinit var changeScreenBrightnessStatus: ChangeScreenBrightnessStatus
   private lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   private lateinit var featureUnlocker: FeatureUnlocker
   private lateinit var brandIcon: View
   private lateinit var enableButton: TextView
   private lateinit var keepScreenOnCheckBox: CompoundButton
+  private lateinit var changeScreenBrightnessCheckBox: CompoundButton
   private lateinit var assistantCheckBox: CompoundButton
 
   override fun onCreate(savedInstanceState: Bundle?) {
     val application = application as TouchBlockerApplication
     floatingViewStatus = application.floatingViewStatus
     keepScreenOnStatus = application.keepScreenOnStatus
+    changeScreenBrightnessStatus = application.changeScreenBrightnessStatus
     accessibilityPermissionRequestTracker = application.accessibilityPermissionRequestTracker
     featureUnlocker = application.featureUnlocker
 
@@ -38,6 +41,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
     brandIcon = findViewById(R.id.brand_icon)
     enableButton = findViewById(R.id.enable)
     keepScreenOnCheckBox = findViewById(R.id.keep_screen_on)
+    changeScreenBrightnessCheckBox = findViewById(R.id.change_screen_brightness)
     assistantCheckBox = findViewById(R.id.enable_assistant)
     if (floatingViewStatus.added) {
       onFloatingViewAdded()
@@ -51,7 +55,8 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
     } else {
       View.GONE
     }
-    keepScreenOnCheckBox.isChecked = keepScreenOnStatus.getKeepScreenOn()
+    keepScreenOnCheckBox.isChecked =
+      keepScreenOnStatus.getKeepScreenOn()
     keepScreenOnCheckBox.setOnCheckedChangeListener { _, isChecked ->
       if (keepScreenOnCheckBox.tag != null) {
         return@setOnCheckedChangeListener
@@ -61,6 +66,19 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
         featureUnlocker.buy(this)
       } else {
         keepScreenOnStatus.setKeepScreenOn(isChecked)
+      }
+    }
+    changeScreenBrightnessCheckBox.isChecked =
+      changeScreenBrightnessStatus.getChangeScreenBrightness()
+    changeScreenBrightnessCheckBox.setOnCheckedChangeListener { _, isChecked ->
+      if (changeScreenBrightnessCheckBox.tag != null) {
+        return@setOnCheckedChangeListener
+      }
+      if (featureUnlocker.state != FeatureUnlocker.State.Purchased) {
+        setChangeScreenBrightnessCheckboxCheckedWithoutCallingListener(false)
+        featureUnlocker.buy(this)
+      } else {
+        changeScreenBrightnessStatus.setChangeScreenBrightness(isChecked)
       }
     }
     assistantCheckBox.isChecked = isDefaultAssistant()
@@ -74,11 +92,15 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
       Toast.makeText(this, toastMessageResource, Toast.LENGTH_LONG).show()
     }
     floatingViewStatus.addListener(this)
+    keepScreenOnStatus.addListener(keepScreenOnStatusListener)
+    changeScreenBrightnessStatus.addListener(changeScreenBrightnessStatusListener)
   }
 
   override fun onDestroy() {
     super.onDestroy()
     floatingViewStatus.removeListener(this)
+    keepScreenOnStatus.removeListener(keepScreenOnStatusListener)
+    changeScreenBrightnessStatus.removeListener(changeScreenBrightnessStatusListener)
   }
 
   override fun onFloatingViewAdded() {
@@ -134,14 +156,31 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener, KeepScreenOnSt
     // No-op.
   }
 
-  override fun update(keepScreenOn: Boolean) {
-    setKeepScreenOnCheckboxCheckedWithoutCallingListener(keepScreenOn)
-  }
+  private val keepScreenOnStatusListener =
+    object : KeepScreenOnStatus.Listener {
+      override fun update(keepScreenOn: Boolean) {
+        setKeepScreenOnCheckboxCheckedWithoutCallingListener(keepScreenOn)
+      }
+    }
+
+
+  private val changeScreenBrightnessStatusListener =
+    object : ChangeScreenBrightnessStatus.Listener {
+      override fun update(changeScreenBrightness: Boolean) {
+        setChangeScreenBrightnessCheckboxCheckedWithoutCallingListener(changeScreenBrightness)
+      }
+    }
 
   private fun setKeepScreenOnCheckboxCheckedWithoutCallingListener(checked: Boolean) {
     keepScreenOnCheckBox.tag = true
     keepScreenOnCheckBox.isChecked = checked
     keepScreenOnCheckBox.tag = null
+  }
+
+  private fun setChangeScreenBrightnessCheckboxCheckedWithoutCallingListener(checked: Boolean) {
+    changeScreenBrightnessCheckBox.tag = true
+    changeScreenBrightnessCheckBox.isChecked = checked
+    changeScreenBrightnessCheckBox.tag = null
   }
 
   override fun onResume() {

@@ -51,6 +51,18 @@
           android:text="@string/keep_screen_on"
           android:textSize="18sp" />
 
+      <CheckBox
+          android:id="@+id/change_screen_brightness"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginHorizontal="12dp"
+          android:layout_marginBottom="32dp"
+          android:gravity="center"
+          android:paddingHorizontal="8dp"
+          android:text="@string/change_screen_brightness"
+          android:textSize="18sp" />
+
       <com.nightlynexus.touchblocker.NontoggleableCheckBox
           android:id="@+id/enable_assistant"
           android:layout_width="match_parent"

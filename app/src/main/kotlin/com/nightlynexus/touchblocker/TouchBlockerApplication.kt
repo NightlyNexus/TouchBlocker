@@ -6,6 +6,7 @@ import com.nightlynexus.featureunlocker.FeatureUnlocker
 class TouchBlockerApplication : Application() {
   internal lateinit var floatingViewStatus: FloatingViewStatus
   internal lateinit var keepScreenOnStatus: KeepScreenOnStatus
+  internal lateinit var changeScreenBrightnessStatus: ChangeScreenBrightnessStatus
   internal lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   internal lateinit var featureUnlocker: FeatureUnlocker
 
@@ -21,12 +22,19 @@ class TouchBlockerApplication : Application() {
         MODE_PRIVATE
       )
     )
+    changeScreenBrightnessStatus = ChangeScreenBrightnessStatus(
+      getSharedPreferences(
+        "change_screen_brightness_status",
+        MODE_PRIVATE
+      )
+    )
     accessibilityPermissionRequestTracker = AccessibilityPermissionRequestTracker()
     featureUnlocker = provideFeatureUnlocker(this)
     featureUnlocker.addListener(object : FeatureUnlocker.Listener {
       override fun stateChanged(state: FeatureUnlocker.State) {
         if (state !== FeatureUnlocker.State.Purchased) {
           keepScreenOnStatus.setKeepScreenOn(false)
+          changeScreenBrightnessStatus.setChangeScreenBrightness(false)
         }
       }
     })

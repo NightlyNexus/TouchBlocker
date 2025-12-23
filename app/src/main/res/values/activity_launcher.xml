@@ -20,7 +20,8 @@
   <string name="enable_button_accessibility_service">Grant permission\nfor screen overlay</string>
   <string name="enable_button_add_floating">Enable</string>
   <string name="enable_button_remove_floating">Remove for now</string>
-  <string name="keep_screen_on"><b>Premium Feature</b>\nKeep screen on\n indefinitely while blocking touches</string>
+  <string name="keep_screen_on"><b>Premium Feature</b>\nKeep screen on\nindefinitely while blocking touches</string>
+  <string name="change_screen_brightness"><b>Premium Feature</b>\nDim screen\nwhile blocking touches</string>
   <string name="enable_assistant">Toggle touch blocking with the assistant button\n(long-press the power button on Pixel devices)</string>
   <string name="enable_assistant_toast">Set Touch\u00A0Blocker as the default assistant app</string>
   <string name="enable_assistant_toast_disable">Change the default assistant app</string>
