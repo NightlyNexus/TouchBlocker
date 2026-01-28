@@ -35,7 +35,8 @@
         android:name=".TouchBlockerAccessibilityService"
         android:exported="false"
         android:label="@string/accessibility_service_label"
-        android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+        android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+        tools:ignore="AccessibilityPolicy"> <!-- Touch Blocker is an accessibility app. -->
       <intent-filter>
         <action android:name="android.accessibilityservice.AccessibilityService" />
       </intent-filter>
