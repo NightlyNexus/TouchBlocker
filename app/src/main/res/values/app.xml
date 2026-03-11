@@ -6,4 +6,6 @@
   <string name="accessibility_service_description">Touch Blocker needs this permission to create a transparent overlay to intercept screen touches. Touch Blocker does nothing else with accessibility features.</string>
   <string name="accessibility_service_intro">Let Touch Blocker use a screen overlay to block touches</string>
   <string name="accessibility_service_summary">Block touches</string>
+
+  <string name="tile_label">Touch Blocker</string>
 </resources>
