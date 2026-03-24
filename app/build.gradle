@@ -15,7 +15,7 @@ android {
   defaultConfig {
     applicationId namespace
 
-    minSdkVersion 26
+    minSdkVersion 23
     targetSdkVersion 36
 
     versionCode versionMajor * 1000000 + versionMinor * 10000 + versionPatch * 100 + versionBuild

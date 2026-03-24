@@ -9,7 +9,7 @@ android {
   compileSdkVersion versions.compileSdk
 
   defaultConfig {
-    minSdk 26
+    minSdk 23
   }
 
   buildTypes {
