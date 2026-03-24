@@ -39,7 +39,7 @@ android {
 dependencies {
   implementation deps.billing
   api deps.kotlin.stdlibJdk8
-  implementation deps.kotlin.coroutines
+  implementation deps.kotlin.coroutines.core
   implementation deps.androidx.activity
   implementation deps.androidx.annotations
   implementation deps.androidx.collection
