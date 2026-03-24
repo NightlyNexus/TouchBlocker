@@ -1,6 +1,7 @@
 package com.nightlynexus.touchblocker
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 internal class ChangeScreenBrightnessStatus(private val sharedPreferences: SharedPreferences) {
   interface Listener {
@@ -11,7 +12,7 @@ internal class ChangeScreenBrightnessStatus(private val sharedPreferences: Share
   private val listeners = mutableSetOf<Listener>()
 
   fun setChangeScreenBrightness(changeScreenBrightness: Boolean) {
-    sharedPreferences.edit().putBoolean(key, changeScreenBrightness).apply()
+    sharedPreferences.edit { putBoolean(key, changeScreenBrightness) }
     for (listener in listeners) {
       listener.update(changeScreenBrightness)
     }

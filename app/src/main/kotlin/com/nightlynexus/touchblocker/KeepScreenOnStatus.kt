@@ -1,6 +1,7 @@
 package com.nightlynexus.touchblocker
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 internal class KeepScreenOnStatus(private val sharedPreferences: SharedPreferences) {
   interface Listener {
@@ -11,7 +12,7 @@ internal class KeepScreenOnStatus(private val sharedPreferences: SharedPreferenc
   private val listeners = mutableSetOf<Listener>()
 
   fun setKeepScreenOn(keepScreenOn: Boolean) {
-    sharedPreferences.edit().putBoolean(key, keepScreenOn).apply()
+    sharedPreferences.edit { putBoolean(key, keepScreenOn) }
     for (listener in listeners) {
       listener.update(keepScreenOn)
     }
