@@ -2,7 +2,10 @@ package com.nightlynexus.touchblocker
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Canvas
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.RippleDrawable
 import android.os.SystemClock
 import android.view.MotionEvent
 import android.view.WindowManager
@@ -16,20 +19,39 @@ internal class FloatingLockView(
   private val windowManager: WindowManager,
   private val layoutParams: WindowManager.LayoutParams,
   private val maxMoveDistanceForClick: Float,
-  private var minX: Int,
-  private var minY: Int,
-  private var maxX: Int,
-  private var maxY: Int,
+  minX: Int,
+  minY: Int,
+  maxX: Int,
+  maxY: Int,
   private val animatePixelsPerSecond: Int,
   private val animateAlphaPerSecond: Float,
   private val lockAnimateAlphaDelayMillis: Long,
   private var screenOn: Boolean,
   private val startFadeOutListener: Runnable
 ) : ImageView(context) {
+  var minX = minX
+    private set
+  var minY = minY
+    private set
+  var maxX = maxX
+    private set
+  var maxY = maxY
+    private set
   var locked: Boolean
     private set
+  private val backgroundContent: GradientDrawable
 
   init {
+    val rippleColor = context.getColor(R.color.lock_background_ripple)
+    backgroundContent = GradientDrawable()
+    backgroundContent.shape = GradientDrawable.RECTANGLE
+    backgroundContent.setColor(context.getColor(R.color.lock_background))
+    background = RippleDrawable(
+      ColorStateList.valueOf(rippleColor),
+      backgroundContent,
+      null
+    )
+
     setImageResource(R.drawable.lock_open_24px)
     contentDescription = context.getText(R.string.lock_content_description_unlocked)
     locked = false
@@ -37,6 +59,10 @@ internal class FloatingLockView(
     if (!screenOn) {
       visibility = GONE
     }
+  }
+
+  fun setBackgroundContentCornerRadius(cornerRadius: Float) {
+    backgroundContent.cornerRadius = cornerRadius
   }
 
   fun setLocked(locked: Boolean) {

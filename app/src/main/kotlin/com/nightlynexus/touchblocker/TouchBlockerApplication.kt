@@ -7,6 +7,7 @@ class TouchBlockerApplication : Application() {
   internal lateinit var floatingViewStatus: FloatingViewStatus
   internal lateinit var keepScreenOnStatus: KeepScreenOnStatus
   internal lateinit var changeScreenBrightnessStatus: ChangeScreenBrightnessStatus
+  internal lateinit var floatingLockViewSizeStatus: FloatingLockViewSizeStatus
   internal lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   internal lateinit var featureUnlocker: FeatureUnlocker
 
@@ -25,6 +26,12 @@ class TouchBlockerApplication : Application() {
     changeScreenBrightnessStatus = ChangeScreenBrightnessStatus(
       getSharedPreferences(
         "change_screen_brightness_status",
+        MODE_PRIVATE
+      )
+    )
+    floatingLockViewSizeStatus = FloatingLockViewSizeStatus(
+      getSharedPreferences(
+        "floating_lock_view_size_status",
         MODE_PRIVATE
       )
     )

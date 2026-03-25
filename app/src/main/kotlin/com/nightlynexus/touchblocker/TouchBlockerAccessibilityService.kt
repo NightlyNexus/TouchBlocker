@@ -20,6 +20,7 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.content.ContextCompat
+import kotlin.math.roundToInt
 
 class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewStatus.Listener {
   private val ACTION_START_BLOCKING_TOUCHES =
@@ -38,6 +39,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
   private lateinit var floatingViewStatus: FloatingViewStatus
   private lateinit var keepScreenOnStatus: KeepScreenOnStatus
   private lateinit var changeScreenBrightnessStatus: ChangeScreenBrightnessStatus
+  private lateinit var floatingLockViewSizeStatus: FloatingLockViewSizeStatus
   private lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   private lateinit var windowManager: WindowManager
   private lateinit var backgroundView: FloatingBackgroundView
@@ -50,6 +52,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
     floatingViewStatus = application.floatingViewStatus
     keepScreenOnStatus = application.keepScreenOnStatus
     changeScreenBrightnessStatus = application.changeScreenBrightnessStatus
+    floatingLockViewSizeStatus = application.floatingLockViewSizeStatus
     accessibilityPermissionRequestTracker = application.accessibilityPermissionRequestTracker
   }
 
@@ -160,9 +163,10 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
       })
     }
 
-    val lockWidth = resources.getDimensionPixelSize(R.dimen.lock_width)
-    val lockHeight = resources.getDimensionPixelSize(R.dimen.lock_height)
-    val maxOutOfScreenBounds = resources.getDimensionPixelSize(R.dimen.max_out_of_screen_bounds)
+    val sizeMultiplier = floatingLockViewSizeStatus.getSizeMultiplier()
+    val lockWidth = lockWidth(sizeMultiplier)
+    val lockHeight = lockHeight(sizeMultiplier)
+    val maxOutOfScreenBounds = maxOutOfScreenBounds(sizeMultiplier)
     val minX = -maxOutOfScreenBounds
     val minY = -maxOutOfScreenBounds
     val maxX = width - lockWidth + maxOutOfScreenBounds
@@ -209,8 +213,8 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
       screenOn,
       startFadeOutListener
     ).apply {
-      setBackgroundResource(R.drawable.lock_background)
-      val padding = resources.getDimensionPixelSize(R.dimen.lock_padding)
+      setBackgroundContentCornerRadius(lockBackgroundCornerRadius(sizeMultiplier))
+      val padding = lockPadding(sizeMultiplier)
       setPadding(padding, padding, padding, padding)
       setOnClickListener(LockViewOnClickListener())
     }
@@ -220,6 +224,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
 
     keepScreenOnStatus.addListener(keepScreenOnStatusListener)
     changeScreenBrightnessStatus.addListener(changeScreenBrightnessStatusListener)
+    floatingLockViewSizeStatus.addListener(floatingLockViewSizeStatusListener)
 
     registerReceiver(screenOffBroadcastReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
     registerReceiver(screenOnBroadcastReceiver, IntentFilter(Intent.ACTION_SCREEN_ON))
@@ -291,6 +296,64 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
       }
     }
 
+  private val floatingLockViewSizeStatusListener =
+    object : FloatingLockViewSizeStatus.Listener {
+      override fun update(sizeMultiplier: Float) {
+        changeLockSize(sizeMultiplier)
+      }
+    }
+
+  private fun changeLockSize(sizeMultiplier: Float) {
+    val width: Int
+    val height: Int
+    if (SDK_INT >= 30) {
+      val currentWindowMetrics = windowManager.currentWindowMetrics
+      val bounds = currentWindowMetrics.bounds
+      width = bounds.width()
+      height = bounds.height()
+      val insets = currentWindowMetrics.windowInsets.getInsets(
+        WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout()
+      )
+    } else {
+      @Suppress("deprecation") val display = windowManager.defaultDisplay
+      val displaySize = Point()
+      @Suppress("deprecation") display.getRealSize(displaySize)
+      width = displaySize.x
+      height = displaySize.y
+    }
+
+    val lockWidth = lockWidth(sizeMultiplier)
+    val lockHeight = lockHeight(sizeMultiplier)
+    val maxOutOfScreenBounds = maxOutOfScreenBounds(sizeMultiplier)
+    val minX = -maxOutOfScreenBounds
+    val minY = -maxOutOfScreenBounds
+    val maxX = width - lockWidth + maxOutOfScreenBounds
+    val maxY = height - lockHeight + maxOutOfScreenBounds
+
+    val oldX = lockViewLayoutParams.x
+    val oldY = lockViewLayoutParams.y
+    val oldMinX = lockView.minX
+    val oldMaxX = lockView.maxX
+    val oldMinY = lockView.minY
+    val oldMaxY = lockView.maxY
+
+    val x = ((oldX - oldMinX) * (maxX - minX) / (oldMaxX - oldMinX).toFloat()).roundToInt() + minX
+    val y = ((oldY - oldMinY) * (maxY - minY) / (oldMaxY - oldMinY).toFloat()).roundToInt() + minY
+
+    lockViewLayoutParams.width = lockWidth
+    lockViewLayoutParams.height = lockHeight
+
+    lockView.reset(x, y, minX, minY, maxX, maxY)
+
+    lockView.setBackgroundContentCornerRadius(lockBackgroundCornerRadius(sizeMultiplier))
+    val lockPadding = lockPadding(sizeMultiplier)
+    lockView.setPadding(lockPadding, lockPadding, lockPadding, lockPadding)
+
+    if (floatingViewStatus.added) {
+      windowManager.updateViewLayout(lockView, lockViewLayoutParams)
+    }
+  }
+
   override fun onDestroy() {
     if (lockView.locked) {
       unlock()
@@ -302,6 +365,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
     floatingViewStatus.removeListener(this)
     keepScreenOnStatus.removeListener(keepScreenOnStatusListener)
     changeScreenBrightnessStatus.removeListener(changeScreenBrightnessStatusListener)
+    floatingLockViewSizeStatus.removeListener(floatingLockViewSizeStatusListener)
     unregisterReceiver(screenOffBroadcastReceiver)
     unregisterReceiver(screenOnBroadcastReceiver)
     unregisterReceiver(unlockedBroadcastReceiver)
@@ -475,9 +539,10 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
 
     backgroundView.reconfigureToast(insetLeft, insetTop, insetRight, insetBottom)
 
-    val lockWidth = resources.getDimensionPixelSize(R.dimen.lock_width)
-    val lockHeight = resources.getDimensionPixelSize(R.dimen.lock_height)
-    val maxOutOfScreenBounds = resources.getDimensionPixelSize(R.dimen.max_out_of_screen_bounds)
+    val sizeMultiplier = floatingLockViewSizeStatus.getSizeMultiplier()
+    val lockWidth = lockWidth(sizeMultiplier)
+    val lockHeight = lockHeight(sizeMultiplier)
+    val maxOutOfScreenBounds = maxOutOfScreenBounds(sizeMultiplier)
     val minX = -maxOutOfScreenBounds
     val minY = -maxOutOfScreenBounds
     val maxX = width - lockWidth + maxOutOfScreenBounds
@@ -489,5 +554,40 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
       windowManager.updateViewLayout(backgroundView, backgroundViewLayoutParams)
       windowManager.updateViewLayout(lockView, lockViewLayoutParams)
     }
+  }
+
+  private fun lockWidth(sizeMultiplier: Float): Int {
+    val width = resources.getDimensionPixelSize(
+      R.dimen.lock_width
+    )
+    return (width * sizeMultiplier).roundToInt()
+  }
+
+  private fun lockHeight(sizeMultiplier: Float): Int {
+    val height = resources.getDimensionPixelSize(
+      R.dimen.lock_height
+    )
+    return (height * sizeMultiplier).roundToInt()
+  }
+
+  private fun lockPadding(sizeMultiplier: Float): Int {
+    val padding = resources.getDimensionPixelSize(
+      R.dimen.lock_padding
+    )
+    return (padding * sizeMultiplier).roundToInt()
+  }
+
+  private fun lockBackgroundCornerRadius(sizeMultiplier: Float): Float {
+    val maxOutOfScreenBounds = resources.getDimensionPixelSize(
+      R.dimen.lock_background_corner_radius
+    )
+    return maxOutOfScreenBounds * sizeMultiplier
+  }
+
+  private fun maxOutOfScreenBounds(sizeMultiplier: Float): Int {
+    val maxOutOfScreenBounds = resources.getDimensionPixelSize(
+      R.dimen.max_out_of_screen_bounds
+    )
+    return (maxOutOfScreenBounds * sizeMultiplier).roundToInt()
   }
 }

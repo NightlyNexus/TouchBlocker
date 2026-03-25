@@ -13,6 +13,7 @@
   <dimen name="lock_width">80dp</dimen>
   <dimen name="lock_height">80dp</dimen>
   <dimen name="lock_padding">16dp</dimen>
+  <dimen name="lock_background_corner_radius">8dp</dimen>
   <dimen name="max_move_distance_for_click">4dp</dimen>
   <dimen name="max_out_of_screen_bounds">16dp</dimen>
   <dimen name="lock_animate_dips_per_second">256dp</dimen>

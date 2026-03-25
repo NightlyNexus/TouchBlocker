@@ -4,20 +4,24 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.nightlynexus.featureunlocker.FeatureUnlocker
+import kotlin.math.roundToInt
 
 class LauncherActivity : Activity(), FloatingViewStatus.Listener {
   private lateinit var floatingViewStatus: FloatingViewStatus
   private lateinit var keepScreenOnStatus: KeepScreenOnStatus
   private lateinit var changeScreenBrightnessStatus: ChangeScreenBrightnessStatus
+  private lateinit var floatingLockViewSizeStatus: FloatingLockViewSizeStatus
   private lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   private lateinit var featureUnlocker: FeatureUnlocker
   private lateinit var brandIcon: View
@@ -25,12 +29,14 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
   private lateinit var keepScreenOnCheckBox: CompoundButton
   private lateinit var changeScreenBrightnessCheckBox: CompoundButton
   private lateinit var assistantCheckBox: CompoundButton
+  private lateinit var floatingLockViewSizeSeekBar: SeekBar
 
   override fun onCreate(savedInstanceState: Bundle?) {
     val application = application as TouchBlockerApplication
     floatingViewStatus = application.floatingViewStatus
     keepScreenOnStatus = application.keepScreenOnStatus
     changeScreenBrightnessStatus = application.changeScreenBrightnessStatus
+    floatingLockViewSizeStatus = application.floatingLockViewSizeStatus
     accessibilityPermissionRequestTracker = application.accessibilityPermissionRequestTracker
     featureUnlocker = application.featureUnlocker
 
@@ -43,6 +49,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     keepScreenOnCheckBox = findViewById(R.id.keep_screen_on)
     changeScreenBrightnessCheckBox = findViewById(R.id.change_screen_brightness)
     assistantCheckBox = findViewById(R.id.enable_assistant)
+    floatingLockViewSizeSeekBar = findViewById(R.id.floating_lock_view_size)
     if (floatingViewStatus.added) {
       onFloatingViewAdded()
     } else if (floatingViewStatus.permissionGranted) {
@@ -55,32 +62,19 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     } else {
       View.GONE
     }
+
     keepScreenOnCheckBox.isChecked =
       keepScreenOnStatus.getKeepScreenOn()
-    keepScreenOnCheckBox.setOnCheckedChangeListener { _, isChecked ->
-      if (keepScreenOnCheckBox.tag != null) {
-        return@setOnCheckedChangeListener
-      }
-      if (featureUnlocker.state != FeatureUnlocker.State.Purchased) {
-        setKeepScreenOnCheckboxCheckedWithoutCallingListener(false)
-        featureUnlocker.buy(this)
-      } else {
-        keepScreenOnStatus.setKeepScreenOn(isChecked)
-      }
-    }
+    keepScreenOnCheckBox.setOnCheckedChangeListener(
+      keepScreenOnCheckBoxListener
+    )
+
     changeScreenBrightnessCheckBox.isChecked =
       changeScreenBrightnessStatus.getChangeScreenBrightness()
-    changeScreenBrightnessCheckBox.setOnCheckedChangeListener { _, isChecked ->
-      if (changeScreenBrightnessCheckBox.tag != null) {
-        return@setOnCheckedChangeListener
-      }
-      if (featureUnlocker.state != FeatureUnlocker.State.Purchased) {
-        setChangeScreenBrightnessCheckboxCheckedWithoutCallingListener(false)
-        featureUnlocker.buy(this)
-      } else {
-        changeScreenBrightnessStatus.setChangeScreenBrightness(isChecked)
-      }
-    }
+    changeScreenBrightnessCheckBox.setOnCheckedChangeListener(
+      changeScreenBrightnessCheckBoxListener
+    )
+
     assistantCheckBox.isChecked = isDefaultAssistant()
     assistantCheckBox.setOnClickListener {
       startActivity(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS))
@@ -91,6 +85,23 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
       }
       Toast.makeText(this, toastMessageResource, Toast.LENGTH_LONG).show()
     }
+
+    assistantCheckBox.setOnClickListener {
+      startActivity(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS))
+      @StringRes val toastMessageResource = if (assistantCheckBox.isChecked) {
+        R.string.enable_assistant_toast_disable
+      } else {
+        R.string.enable_assistant_toast
+      }
+      Toast.makeText(this, toastMessageResource, Toast.LENGTH_LONG).show()
+    }
+
+    floatingLockViewSizeSeekBar.progress =
+      progress(floatingLockViewSizeStatus.getSizeMultiplier())
+    floatingLockViewSizeSeekBar.setOnSeekBarChangeListener(
+      floatingLockViewSizeSeekBarListener
+    )
+
     floatingViewStatus.addListener(this)
     keepScreenOnStatus.addListener(keepScreenOnStatusListener)
     changeScreenBrightnessStatus.addListener(changeScreenBrightnessStatusListener)
@@ -156,6 +167,18 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     // No-op.
   }
 
+  private val keepScreenOnCheckBoxListener =
+    CompoundButton.OnCheckedChangeListener { _, isChecked ->
+      if (featureUnlocker.state != FeatureUnlocker.State.Purchased) {
+        setKeepScreenOnCheckboxCheckedWithoutCallingListener(false)
+        featureUnlocker.buy(this)
+      } else {
+        keepScreenOnStatus.removeListener(keepScreenOnStatusListener)
+        keepScreenOnStatus.setKeepScreenOn(isChecked)
+        keepScreenOnStatus.addListener(keepScreenOnStatusListener)
+      }
+    }
+
   private val keepScreenOnStatusListener =
     object : KeepScreenOnStatus.Listener {
       override fun update(keepScreenOn: Boolean) {
@@ -163,6 +186,25 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
       }
     }
 
+  private fun setKeepScreenOnCheckboxCheckedWithoutCallingListener(checked: Boolean) {
+    keepScreenOnCheckBox.setOnCheckedChangeListener(null)
+    keepScreenOnCheckBox.isChecked = checked
+    keepScreenOnCheckBox.setOnCheckedChangeListener(
+      keepScreenOnCheckBoxListener
+    )
+  }
+
+  private val changeScreenBrightnessCheckBoxListener =
+    CompoundButton.OnCheckedChangeListener { _, isChecked ->
+      if (featureUnlocker.state != FeatureUnlocker.State.Purchased) {
+        setChangeScreenBrightnessCheckboxCheckedWithoutCallingListener(false)
+        featureUnlocker.buy(this)
+      } else {
+        changeScreenBrightnessStatus.removeListener(changeScreenBrightnessStatusListener)
+        changeScreenBrightnessStatus.setChangeScreenBrightness(isChecked)
+        changeScreenBrightnessStatus.addListener(changeScreenBrightnessStatusListener)
+      }
+    }
 
   private val changeScreenBrightnessStatusListener =
     object : ChangeScreenBrightnessStatus.Listener {
@@ -171,16 +213,48 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
       }
     }
 
-  private fun setKeepScreenOnCheckboxCheckedWithoutCallingListener(checked: Boolean) {
-    keepScreenOnCheckBox.tag = true
-    keepScreenOnCheckBox.isChecked = checked
-    keepScreenOnCheckBox.tag = null
+  private fun setChangeScreenBrightnessCheckboxCheckedWithoutCallingListener(checked: Boolean) {
+    changeScreenBrightnessCheckBox.setOnCheckedChangeListener(null)
+    changeScreenBrightnessCheckBox.isChecked = checked
+    changeScreenBrightnessCheckBox.setOnCheckedChangeListener(
+      changeScreenBrightnessCheckBoxListener
+    )
   }
 
-  private fun setChangeScreenBrightnessCheckboxCheckedWithoutCallingListener(checked: Boolean) {
-    changeScreenBrightnessCheckBox.tag = true
-    changeScreenBrightnessCheckBox.isChecked = checked
-    changeScreenBrightnessCheckBox.tag = null
+  private val floatingLockViewSizeSeekBarListener =
+    object : SeekBar.OnSeekBarChangeListener {
+      override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+        floatingLockViewSizeStatus.removeListener(floatingLockViewSizeStatusListener)
+        floatingLockViewSizeStatus.setSizeMultiplier(
+          sizeMultiplier(progress)
+        )
+        floatingLockViewSizeStatus.addListener(floatingLockViewSizeStatusListener)
+      }
+
+      override fun onStartTrackingTouch(seekBar: SeekBar) {
+        // No-op.
+      }
+
+      override fun onStopTrackingTouch(seekBar: SeekBar) {
+        // No-op.
+      }
+    }
+
+  private val floatingLockViewSizeStatusListener =
+    object : FloatingLockViewSizeStatus.Listener {
+      override fun update(sizeMultiplier: Float) {
+        setFloatingLockViewSizeSeekBarProgressWithoutCallingListener(
+          progress(sizeMultiplier)
+        )
+      }
+    }
+
+  private fun setFloatingLockViewSizeSeekBarProgressWithoutCallingListener(progress: Int) {
+    floatingLockViewSizeSeekBar.setOnSeekBarChangeListener(null)
+    floatingLockViewSizeSeekBar.progress = progress
+    floatingLockViewSizeSeekBar.setOnSeekBarChangeListener(
+      floatingLockViewSizeSeekBarListener
+    )
   }
 
   override fun onResume() {
@@ -188,6 +262,60 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     // I do not know of a broadcast to know exactly when the default assistant app changed,
     // so I will check in onResume.
     assistantCheckBox.isChecked = isDefaultAssistant()
+  }
+
+  private fun sizeMultiplier(progress: Int): Float {
+    return sizeMultiplier(
+      progress,
+      if (SDK_INT >= 26) floatingLockViewSizeSeekBar.min else 0,
+      floatingLockViewSizeSeekBar.max,
+      FloatingLockViewSizeStatus.sizeMultiplierMin,
+      FloatingLockViewSizeStatus.sizeMultiplierMax
+    )
+  }
+
+  private fun progress(sizeMultiplier: Float): Int {
+    return progress(
+      sizeMultiplier,
+      if (SDK_INT >= 26) floatingLockViewSizeSeekBar.min else 0,
+      floatingLockViewSizeSeekBar.max,
+      FloatingLockViewSizeStatus.sizeMultiplierMin,
+      FloatingLockViewSizeStatus.sizeMultiplierMax
+    )
+  }
+
+  private fun sizeMultiplier(
+    progress: Int,
+    progressMin: Int,
+    progressMax: Int,
+    sizeMultiplierMin: Float,
+    sizeMultiplierMax: Float
+  ): Float {
+    val mid = (progressMin + progressMax) / 2f
+    return if (progress <= mid) {
+      sizeMultiplierMin +
+        (1 - sizeMultiplierMin) * (progress - progressMin) / (mid - progressMin)
+    } else {
+      1 +
+        (sizeMultiplierMax - 1) * (progress - mid) / (progressMax - mid)
+    }
+  }
+
+  private fun progress(
+    sizeMultiplier: Float,
+    progressMin: Int,
+    progressMax: Int,
+    sizeMultiplierMin: Float,
+    sizeMultiplierMax: Float
+  ): Int {
+    val mid = (progressMin + progressMax) / 2f
+    return if (sizeMultiplier <= 1) {
+      progressMin +
+        (sizeMultiplier - sizeMultiplierMin) / (1 - sizeMultiplierMin) * (mid - progressMin)
+    } else {
+      mid +
+        (sizeMultiplier - 1) / (sizeMultiplierMax - 1) * (progressMax - mid)
+    }.roundToInt()
   }
 
   private fun isDefaultAssistant(): Boolean {

@@ -25,6 +25,7 @@
   <string name="enable_assistant">Toggle touch blocking with the assistant button\n(long-press the power button on Pixel devices)</string>
   <string name="enable_assistant_toast">Set Touch\u00A0Blocker as the default assistant app</string>
   <string name="enable_assistant_toast_disable">Change the default assistant app</string>
+  <string name="float_lock_view_size_label">Change floating lock button size</string>
   <string name="brand_icon_content_description">Touch Blocker icon</string>
   <string name="footer">An app by Eric Cochran</string>
 
