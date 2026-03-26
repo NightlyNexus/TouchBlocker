@@ -52,7 +52,7 @@ internal class FloatingLockView(
       null
     )
 
-    setImageResource(R.drawable.lock_open_24px)
+    setImageResource(R.drawable.lock_open_right_24px)
     contentDescription = context.getText(R.string.lock_content_description_unlocked)
     locked = false
 
@@ -71,7 +71,7 @@ internal class FloatingLockView(
       contentDescription = context.getText(R.string.lock_content_description_locked)
       this.locked = true
     } else {
-      setImageResource(R.drawable.lock_open_24px)
+      setImageResource(R.drawable.lock_open_right_24px)
       contentDescription = context.getText(R.string.lock_content_description_unlocked)
       this.locked = false
     }
