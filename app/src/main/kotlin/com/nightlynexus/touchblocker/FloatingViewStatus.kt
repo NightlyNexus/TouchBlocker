@@ -14,8 +14,8 @@ internal class FloatingViewStatus(permissionGranted: Boolean) {
 
   fun setAdded(added: Boolean) {
     check(this.added != added)
+    this.added = added
     for (listener in listeners) {
-      this.added = added
       if (added) {
         listener.onFloatingViewAdded()
       } else {
