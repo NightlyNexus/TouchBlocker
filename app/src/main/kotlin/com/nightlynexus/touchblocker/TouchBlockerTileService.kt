@@ -34,9 +34,11 @@ class TouchBlockerTileService : TileService() {
     val qsTile = qsTile
     if (floatingViewStatus.added) {
       qsTile.setGrantPermissionSubtitle(false)
+      qsTile.icon = tileIcon(this, floatingViewStatus.locked)
       qsTile.state = Tile.STATE_ACTIVE
     } else {
       qsTile.setGrantPermissionSubtitle(!floatingViewStatus.permissionGranted)
+      qsTile.icon = tileIcon(this, locked = false)
       qsTile.state = Tile.STATE_INACTIVE
     }
     qsTile.updateTile()
@@ -103,7 +105,7 @@ internal fun updateTileService(context: Context) {
   )
 }
 
-internal fun requestAddTileService(context: Context) {
+internal fun requestAddTileService(context: Context, locked: Boolean) {
   if (SDK_INT < 33) {
     return
   }
@@ -111,7 +113,7 @@ internal fun requestAddTileService(context: Context) {
   statusBarService.requestAddTileService(
     ComponentName(context, TouchBlockerTileService::class.java),
     context.getText(R.string.tile_label),
-    Icon.createWithResource(context, R.drawable.lock_open_right_24px),
+    tileIcon(context, locked),
     HandlerExecutor(Handler(Looper.getMainLooper())),
   ) {
     // No-op on the result.
@@ -122,4 +124,13 @@ private class HandlerExecutor(private val handler: Handler) : Executor {
   override fun execute(command: Runnable) {
     handler.post(command)
   }
+}
+
+private fun tileIcon(context: Context, locked: Boolean) : Icon {
+  val iconDrawableResourceId = if (locked) {
+    R.drawable.lock_24px
+  } else {
+    R.drawable.lock_open_right_24px
+  }
+  return Icon.createWithResource(context, iconDrawableResourceId)
 }

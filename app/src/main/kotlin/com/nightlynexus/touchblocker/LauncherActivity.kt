@@ -110,7 +110,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     requestAddTileServiceButton.setOnClickListener {
       shouldRequestAddTileServiceStatus.setShouldRequest(false)
       requestAddTileServiceButton.visibility = View.GONE
-      requestAddTileService(this)
+      requestAddTileService(this, floatingViewStatus.locked)
     }
 
     floatingLockViewSizeSeekBar.progress =
