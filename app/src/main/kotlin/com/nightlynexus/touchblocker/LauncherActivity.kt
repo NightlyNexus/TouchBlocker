@@ -105,6 +105,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     floatingViewStatus.addListener(this)
     keepScreenOnStatus.addListener(keepScreenOnStatusListener)
     changeScreenBrightnessStatus.addListener(changeScreenBrightnessStatusListener)
+    floatingLockViewSizeStatus.addListener(floatingLockViewSizeStatusListener)
   }
 
   override fun onDestroy() {
@@ -112,6 +113,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     floatingViewStatus.removeListener(this)
     keepScreenOnStatus.removeListener(keepScreenOnStatusListener)
     changeScreenBrightnessStatus.removeListener(changeScreenBrightnessStatusListener)
+    floatingLockViewSizeStatus.removeListener(floatingLockViewSizeStatusListener)
   }
 
   override fun onFloatingViewAdded() {
