@@ -37,8 +37,7 @@ internal class FloatingLockView(
     private set
   var maxY = maxY
     private set
-  var locked: Boolean
-    private set
+  private var locked: Boolean
   private val backgroundContent: GradientDrawable
 
   init {

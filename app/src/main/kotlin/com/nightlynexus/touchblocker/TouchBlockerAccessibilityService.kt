@@ -69,6 +69,16 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
     backgroundView.setHasShownToast(false)
   }
 
+  override fun onFloatingViewLocked() {
+    backgroundView.setLocked(true)
+    lockView.setLocked(true)
+  }
+
+  override fun onFloatingViewUnlocked() {
+    backgroundView.setLocked(false)
+    lockView.setLocked(false)
+  }
+
   override fun onFloatingViewPermissionGranted() {
     // No-op.
   }
@@ -355,7 +365,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
   }
 
   override fun onDestroy() {
-    if (lockView.locked) {
+    if (floatingViewStatus.locked) {
       unlock()
     }
     if (floatingViewStatus.added) {
@@ -386,7 +396,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
 
   private inner class LockViewOnClickListener : View.OnClickListener {
     override fun onClick(v: View) {
-      if (lockView.locked) {
+      if (floatingViewStatus.locked) {
         unlock()
       } else {
         lock()
@@ -395,18 +405,16 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
   }
 
   private fun lock() {
-    backgroundView.setLocked(true)
-    lockView.setLocked(true)
+    floatingViewStatus.setLocked(true)
   }
 
   private fun unlock() {
-    backgroundView.setLocked(false)
-    lockView.setLocked(false)
+    floatingViewStatus.setLocked(false)
   }
 
   override fun onToggle() {
     if (floatingViewStatus.added) {
-      if (lockView.locked) {
+      if (floatingViewStatus.locked) {
         unlock()
         floatingViewStatus.setAdded(false)
       } else {
@@ -414,7 +422,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
         lockView.resetFadeTimer()
       }
     } else {
-      if (lockView.locked) {
+      if (floatingViewStatus.locked) {
         throw IllegalStateException("Not added but locked.")
       } else {
         floatingViewStatus.setAdded(true)
@@ -451,14 +459,14 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
   private val startBlockingTouchesBroadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
       if (floatingViewStatus.added) {
-        if (lockView.locked) {
+        if (floatingViewStatus.locked) {
           // Already blocking touches.
         } else {
           lock()
           lockView.resetFadeTimer()
         }
       } else {
-        if (lockView.locked) {
+        if (floatingViewStatus.locked) {
           throw IllegalStateException("Not added but locked.")
         } else {
           floatingViewStatus.setAdded(true)
@@ -472,7 +480,7 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
   private val endBlockingTouchesBroadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
       if (floatingViewStatus.added) {
-        if (lockView.locked) {
+        if (floatingViewStatus.locked) {
           unlock()
           floatingViewStatus.setAdded(false)
         } else {

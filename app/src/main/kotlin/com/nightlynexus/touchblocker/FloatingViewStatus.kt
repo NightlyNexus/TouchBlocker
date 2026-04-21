@@ -4,6 +4,8 @@ internal class FloatingViewStatus(permissionGranted: Boolean) {
   interface Listener {
     fun onFloatingViewAdded()
     fun onFloatingViewRemoved()
+    fun onFloatingViewLocked()
+    fun onFloatingViewUnlocked()
     fun onFloatingViewPermissionGranted()
     fun onFloatingViewPermissionRevoked()
     fun onToggle()
@@ -20,6 +22,22 @@ internal class FloatingViewStatus(permissionGranted: Boolean) {
         listener.onFloatingViewAdded()
       } else {
         listener.onFloatingViewRemoved()
+      }
+    }
+  }
+
+  var locked = false
+    private set
+
+  fun setLocked(locked: Boolean) {
+    check(!locked || added)
+    check(this.locked != locked)
+    this.locked = locked
+    for (listener in listeners) {
+      if (locked) {
+        listener.onFloatingViewLocked()
+      } else {
+        listener.onFloatingViewUnlocked()
       }
     }
   }

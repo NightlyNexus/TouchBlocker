@@ -149,6 +149,14 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     }
   }
 
+  override fun onFloatingViewLocked() {
+    // No-op.
+  }
+
+  override fun onFloatingViewUnlocked() {
+    // No-op.
+  }
+
   override fun onFloatingViewPermissionGranted() {
     onFloatingViewRemoved()
   }

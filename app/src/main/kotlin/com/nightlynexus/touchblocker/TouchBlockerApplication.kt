@@ -57,6 +57,14 @@ class TouchBlockerApplication : Application() {
         updateTileService(this@TouchBlockerApplication)
       }
 
+      override fun onFloatingViewLocked() {
+        // TODO: updateTileService(this@TouchBlockerApplication)
+      }
+
+      override fun onFloatingViewUnlocked() {
+        // TODO: updateTileService(this@TouchBlockerApplication)
+      }
+
       override fun onFloatingViewPermissionGranted() {
         updateTileService(this@TouchBlockerApplication)
       }
