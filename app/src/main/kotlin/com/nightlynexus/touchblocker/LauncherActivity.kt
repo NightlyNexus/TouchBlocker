@@ -32,6 +32,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
   private lateinit var assistantCheckBox: CompoundButton
   private lateinit var requestAddTileServiceButton: View
   private lateinit var floatingLockViewSizeSeekBar: SeekBar
+  private var permissionDialog: AlertDialog? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     val application = application as TouchBlockerApplication
@@ -128,6 +129,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
 
   override fun onDestroy() {
     super.onDestroy()
+    permissionDialog?.dismiss()
     floatingViewStatus.removeListener(this)
     keepScreenOnStatus.removeListener(keepScreenOnStatusListener)
     changeScreenBrightnessStatus.removeListener(changeScreenBrightnessStatusListener)
@@ -169,16 +171,17 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
   }
 
   private fun showPermissionDialog() {
-    val alertDialog = AlertDialog.Builder(this, R.style.DialogPermissionStyle)
+    val permissionDialog = AlertDialog.Builder(this, R.style.DialogPermissionStyle)
       .setView(R.layout.dialog_permission)
       .show()
-    alertDialog.findViewById<View>(R.id.dialog_permission_button_confirm)!!.setOnClickListener {
-      alertDialog.dismiss()
+    permissionDialog.findViewById<View>(R.id.dialog_permission_button_confirm)!!.setOnClickListener {
+      permissionDialog.dismiss()
       requestPermission()
     }
-    alertDialog.findViewById<View>(R.id.dialog_permission_button_cancel)!!.setOnClickListener {
-      alertDialog.cancel()
+    permissionDialog.findViewById<View>(R.id.dialog_permission_button_cancel)!!.setOnClickListener {
+      permissionDialog.cancel()
     }
+    this.permissionDialog = permissionDialog
   }
 
   private fun requestPermission() {
