@@ -13,6 +13,7 @@ class TouchBlockerApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()
+
     floatingViewStatus = FloatingViewStatus(isAccessibilityServiceEnabled(
       this,
       TouchBlockerAccessibilityService::class.java
@@ -35,7 +36,32 @@ class TouchBlockerApplication : Application() {
         MODE_PRIVATE
       )
     )
+
     accessibilityPermissionRequestTracker = AccessibilityPermissionRequestTracker()
+
+    floatingViewStatus.addListener(object: FloatingViewStatus.Listener {
+      override fun onFloatingViewAdded() {
+        updateTileService(this@TouchBlockerApplication)
+      }
+
+      override fun onFloatingViewRemoved() {
+        updateTileService(this@TouchBlockerApplication)
+      }
+
+      override fun onFloatingViewPermissionGranted() {
+        updateTileService(this@TouchBlockerApplication)
+      }
+
+      override fun onFloatingViewPermissionRevoked() {
+        updateTileService(this@TouchBlockerApplication)
+      }
+
+      override fun onToggle() {
+        // No-op.
+      }
+    })
+    updateTileService(this)
+
     featureUnlocker = provideFeatureUnlocker(this)
     featureUnlocker.addListener(object : FeatureUnlocker.Listener {
       override fun stateChanged(state: FeatureUnlocker.State) {
@@ -46,7 +72,5 @@ class TouchBlockerApplication : Application() {
       }
     })
     featureUnlocker.startConnection()
-
-    updateTileService(this)
   }
 }

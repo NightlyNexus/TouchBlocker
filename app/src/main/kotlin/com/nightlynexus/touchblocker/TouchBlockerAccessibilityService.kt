@@ -59,8 +59,6 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
   override fun onFloatingViewAdded() {
     windowManager.addView(backgroundView, backgroundViewLayoutParams)
     windowManager.addView(lockView, lockViewLayoutParams)
-
-    updateTileService(this)
   }
 
   override fun onFloatingViewRemoved() {
@@ -69,16 +67,14 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
     lockView.resetAlpha()
     backgroundView.cancelToast()
     backgroundView.setHasShownToast(false)
-
-    updateTileService(this)
   }
 
   override fun onFloatingViewPermissionGranted() {
-    updateTileService(this)
+    // No-op.
   }
 
   override fun onFloatingViewPermissionRevoked() {
-    updateTileService(this)
+    // No-op.
   }
 
   override fun onServiceConnected() {
