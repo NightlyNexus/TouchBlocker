@@ -15,7 +15,10 @@ class NoDisplayActivity : Activity() {
       floatingViewStatus.toggle()
     } else {
       startActivity(
-        accessibilityServicesSettingsIntent().addFlags(
+        Intent(
+          this,
+          LauncherActivity::class.java
+        ).addFlags(
           Intent.FLAG_ACTIVITY_NEW_TASK or
             Intent.FLAG_ACTIVITY_CLEAR_TOP or
             Intent.FLAG_ACTIVITY_SINGLE_TOP
