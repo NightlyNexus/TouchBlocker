@@ -1,6 +1,7 @@
 package com.nightlynexus.touchblocker
 
 import android.accessibilityservice.AccessibilityService
+import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -22,6 +23,7 @@ import android.view.accessibility.AccessibilityEvent
 import androidx.core.content.ContextCompat
 import kotlin.math.roundToInt
 
+@SuppressLint("AccessibilityPolicy") // Touch Blocker is an accessibility app.
 class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewStatus.Listener {
   private val ACTION_START_BLOCKING_TOUCHES =
     "com.nightlynexus.touchblocker.ACTION_START_BLOCKING_TOUCHES"
