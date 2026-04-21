@@ -160,6 +160,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
   }
 
   override fun onFloatingViewPermissionGranted() {
+    permissionDialog?.dismiss()
     onFloatingViewRemoved()
   }
 
