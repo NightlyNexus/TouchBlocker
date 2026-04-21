@@ -2,6 +2,8 @@ package com.nightlynexus.touchblocker
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.role.RoleManager
+import android.content.ComponentName
 import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Build.VERSION.SDK_INT
@@ -363,8 +365,17 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
   }
 
   private fun isDefaultAssistant(): Boolean {
+    if (SDK_INT >= 29) {
+      val roleManager = getSystemService(RoleManager::class.java)
+      return roleManager.isRoleHeld(RoleManager.ROLE_ASSISTANT)
+    }
     // This only takes a millisecond or two on my Pixel 6.
-    val assistant = Settings.Secure.getString(contentResolver, "assistant")
-    return assistant == "$packageName/${NoDisplayActivity::class.qualifiedName}"
+    val assistantSetting = Settings.Secure.getString(contentResolver, "assistant")
+    if (assistantSetting == null) {
+      return false
+    }
+    val assistant = ComponentName.unflattenFromString(assistantSetting)
+    val touchBlockerAssistant = ComponentName(this, NoDisplayActivity::class.java)
+    return assistant == touchBlockerAssistant
   }
 }
