@@ -4,6 +4,7 @@ import android.app.Application
 import com.nightlynexus.featureunlocker.FeatureUnlocker
 
 class TouchBlockerApplication : Application() {
+  internal lateinit var floatingViewStatusListener: FloatingViewStatus.Listener
   internal lateinit var floatingViewStatus: FloatingViewStatus
   internal lateinit var keepScreenOnStatus: KeepScreenOnStatus
   internal lateinit var changeScreenBrightnessStatus: ChangeScreenBrightnessStatus
@@ -48,35 +49,38 @@ class TouchBlockerApplication : Application() {
 
     featureUnlocker = provideFeatureUnlocker(this)
 
-    floatingViewStatus.addListener(object: FloatingViewStatus.Listener {
+    floatingViewStatusListener = object: FloatingViewStatus.Listener {
+      private val context = this@TouchBlockerApplication
+
       override fun onFloatingViewAdded() {
-        updateTileService(this@TouchBlockerApplication)
+        updateTileService(context)
       }
 
       override fun onFloatingViewRemoved() {
-        updateTileService(this@TouchBlockerApplication)
+        updateTileService(context)
       }
 
       override fun onFloatingViewLocked() {
-        updateTileService(this@TouchBlockerApplication)
+        updateTileService(context)
       }
 
       override fun onFloatingViewUnlocked() {
-        updateTileService(this@TouchBlockerApplication)
+        updateTileService(context)
       }
 
       override fun onFloatingViewPermissionGranted() {
-        updateTileService(this@TouchBlockerApplication)
+        updateTileService(context)
       }
 
       override fun onFloatingViewPermissionRevoked() {
-        updateTileService(this@TouchBlockerApplication)
+        updateTileService(context)
       }
 
       override fun onToggle() {
         // No-op.
       }
-    })
+    }
+    floatingViewStatus.addListener(floatingViewStatusListener)
     updateTileService(this)
 
     featureUnlocker.addListener(object : FeatureUnlocker.Listener {

@@ -17,11 +17,13 @@ import java.util.concurrent.Executor
 
 @RequiresApi(24)
 class TouchBlockerTileService : TileService() {
+  private lateinit var floatingViewStatusListener: FloatingViewStatus.Listener
   private lateinit var floatingViewStatus: FloatingViewStatus
   private lateinit var shouldRequestAddTileServiceStatus: ShouldRequestAddTileServiceStatus
 
   override fun onCreate() {
     val application = application as TouchBlockerApplication
+    floatingViewStatusListener = application.floatingViewStatusListener
     floatingViewStatus = application.floatingViewStatus
     shouldRequestAddTileServiceStatus = application.shouldRequestAddTileServiceStatus
   }
@@ -47,11 +49,12 @@ class TouchBlockerTileService : TileService() {
   override fun onClick() {
     if (floatingViewStatus.permissionGranted) {
       val qsTile = qsTile
+      // Skip the FloatingViewStatus.Listener that would call updateTileService unnecessarily.
       if (floatingViewStatus.added) {
-        floatingViewStatus.setAdded(false)
+        floatingViewStatus.setAdded(false, skip = floatingViewStatusListener)
         qsTile.state = Tile.STATE_INACTIVE
       } else {
-        floatingViewStatus.setAdded(true)
+        floatingViewStatus.setAdded(true, skip = floatingViewStatusListener)
         qsTile.state = Tile.STATE_ACTIVE
       }
       qsTile.updateTile()

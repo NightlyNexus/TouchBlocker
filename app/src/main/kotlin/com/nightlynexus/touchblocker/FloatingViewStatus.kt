@@ -14,14 +14,16 @@ internal class FloatingViewStatus(permissionGranted: Boolean) {
   var added = false
     private set
 
-  fun setAdded(added: Boolean) {
+  fun setAdded(added: Boolean, skip: Listener? = null) {
     check(this.added != added)
     this.added = added
     for (listener in listeners) {
-      if (added) {
-        listener.onFloatingViewAdded()
-      } else {
-        listener.onFloatingViewRemoved()
+      if (listener != skip) {
+        if (added) {
+          listener.onFloatingViewAdded()
+        } else {
+          listener.onFloatingViewRemoved()
+        }
       }
     }
   }
