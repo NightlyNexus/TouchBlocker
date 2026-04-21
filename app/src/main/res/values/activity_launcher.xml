@@ -17,6 +17,11 @@
     <item name="colorControlHighlight">@color/enable_button_ripple</item>
   </style>
 
+  <style name="RequestAddTileServiceButton">
+    <item name="colorControlHighlight">@color/request_add_tile_service_button_ripple</item>
+  </style>
+
+  <string name="brand_icon_content_description">Touch Blocker icon</string>
   <string name="enable_button_accessibility_service">Grant permission\nfor screen overlay</string>
   <string name="enable_button_add_floating">Enable</string>
   <string name="enable_button_remove_floating">Remove for now</string>
@@ -26,7 +31,7 @@
   <string name="enable_assistant_toast">Set Touch\u00A0Blocker as the default assistant app</string>
   <string name="enable_assistant_toast_disable">Change the default assistant app</string>
   <string name="float_lock_view_size_label">Change floating lock button size</string>
-  <string name="brand_icon_content_description">Touch Blocker icon</string>
+  <string name="request_add_tile_service_button">Try adding a Quick Settings tile</string>
   <string name="footer">An app by Eric Cochran</string>
 
   <color name="primary">#111133</color>
@@ -35,4 +40,7 @@
   <color name="enable_button_background_tint">@color/accent</color>
   <color name="enable_button_ripple">@color/window_background</color>
   <color name="enable_button_text">#FFFFFF</color>
+  <color name="request_add_tile_service_button_background_tint">#222266</color>
+  <color name="request_add_tile_service_button_ripple">@color/window_background</color>
+  <color name="request_add_tile_service_button_text">#FFFFFF</color>
 </resources>

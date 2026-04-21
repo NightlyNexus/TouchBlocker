@@ -24,6 +24,7 @@
         android:id="@+id/buttons"
         android:layout_width="256dp"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         android:orientation="vertical">
 
       <Button
@@ -75,6 +76,20 @@
           android:paddingHorizontal="8dp"
           android:text="@string/enable_assistant"
           android:textSize="16sp" />
+
+      <Button
+          android:id="@+id/request_add_tile_service"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginBottom="32dp"
+          android:backgroundTint="@color/request_add_tile_service_button_background_tint"
+          android:padding="16dp"
+          android:text="@string/request_add_tile_service_button"
+          android:textAllCaps="false"
+          android:textColor="@color/request_add_tile_service_button_text"
+          android:textSize="16sp"
+          android:theme="@style/RequestAddTileServiceButton" />
 
       <TextView
           android:layout_width="wrap_content"

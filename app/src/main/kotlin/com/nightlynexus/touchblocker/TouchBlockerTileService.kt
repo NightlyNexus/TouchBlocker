@@ -2,21 +2,32 @@ package com.nightlynexus.touchblocker
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.app.StatusBarManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.os.Build.VERSION.SDK_INT
+import android.os.Handler
+import android.os.Looper
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
+import java.util.concurrent.Executor
 
 @RequiresApi(24)
 class TouchBlockerTileService : TileService() {
   private lateinit var floatingViewStatus: FloatingViewStatus
+  private lateinit var shouldRequestAddTileServiceStatus: ShouldRequestAddTileServiceStatus
 
   override fun onCreate() {
     val application = application as TouchBlockerApplication
     floatingViewStatus = application.floatingViewStatus
+    shouldRequestAddTileServiceStatus = application.shouldRequestAddTileServiceStatus
+  }
+
+  override fun onTileAdded() {
+    shouldRequestAddTileServiceStatus.setShouldRequest(false)
   }
 
   override fun onStartListening() {
@@ -83,10 +94,32 @@ class TouchBlockerTileService : TileService() {
 }
 
 internal fun updateTileService(context: Context) {
-  if (SDK_INT >= 24) {
-    TileService.requestListeningState(
-      context,
-      ComponentName(context, TouchBlockerTileService::class.java)
-    )
+  if (SDK_INT < 24) {
+    return
+  }
+  TileService.requestListeningState(
+    context,
+    ComponentName(context, TouchBlockerTileService::class.java)
+  )
+}
+
+internal fun requestAddTileService(context: Context) {
+  if (SDK_INT < 33) {
+    return
+  }
+  val statusBarService = context.getSystemService(StatusBarManager::class.java)
+  statusBarService.requestAddTileService(
+    ComponentName(context, TouchBlockerTileService::class.java),
+    context.getText(R.string.tile_label),
+    Icon.createWithResource(context, R.drawable.lock_open_right_24px),
+    HandlerExecutor(Handler(Looper.getMainLooper())),
+  ) {
+    // No-op on the result.
+  }
+}
+
+private class HandlerExecutor(private val handler: Handler) : Executor {
+  override fun execute(command: Runnable) {
+    handler.post(command)
   }
 }

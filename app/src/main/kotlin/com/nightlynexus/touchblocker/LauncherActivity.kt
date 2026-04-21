@@ -22,6 +22,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
   private lateinit var keepScreenOnStatus: KeepScreenOnStatus
   private lateinit var changeScreenBrightnessStatus: ChangeScreenBrightnessStatus
   private lateinit var floatingLockViewSizeStatus: FloatingLockViewSizeStatus
+  private lateinit var shouldRequestAddTileServiceStatus: ShouldRequestAddTileServiceStatus
   private lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   private lateinit var featureUnlocker: FeatureUnlocker
   private lateinit var brandIcon: View
@@ -29,6 +30,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
   private lateinit var keepScreenOnCheckBox: CompoundButton
   private lateinit var changeScreenBrightnessCheckBox: CompoundButton
   private lateinit var assistantCheckBox: CompoundButton
+  private lateinit var requestAddTileServiceButton: View
   private lateinit var floatingLockViewSizeSeekBar: SeekBar
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +39,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     keepScreenOnStatus = application.keepScreenOnStatus
     changeScreenBrightnessStatus = application.changeScreenBrightnessStatus
     floatingLockViewSizeStatus = application.floatingLockViewSizeStatus
+    shouldRequestAddTileServiceStatus = application.shouldRequestAddTileServiceStatus
     accessibilityPermissionRequestTracker = application.accessibilityPermissionRequestTracker
     featureUnlocker = application.featureUnlocker
 
@@ -49,6 +52,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     keepScreenOnCheckBox = findViewById(R.id.keep_screen_on)
     changeScreenBrightnessCheckBox = findViewById(R.id.change_screen_brightness)
     assistantCheckBox = findViewById(R.id.enable_assistant)
+    requestAddTileServiceButton = findViewById(R.id.request_add_tile_service)
     floatingLockViewSizeSeekBar = findViewById(R.id.floating_lock_view_size)
     if (floatingViewStatus.added) {
       onFloatingViewAdded()
@@ -96,6 +100,19 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
       Toast.makeText(this, toastMessageResource, Toast.LENGTH_LONG).show()
     }
 
+    requestAddTileServiceButton.visibility = if (
+      shouldRequestAddTileServiceStatus.getShouldRequest()
+    ) {
+      View.VISIBLE
+    } else {
+      View.GONE
+    }
+    requestAddTileServiceButton.setOnClickListener {
+      shouldRequestAddTileServiceStatus.setShouldRequest(false)
+      requestAddTileServiceButton.visibility = View.GONE
+      requestAddTileService(this)
+    }
+
     floatingLockViewSizeSeekBar.progress =
       progress(floatingLockViewSizeStatus.getSizeMultiplier())
     floatingLockViewSizeSeekBar.setOnSeekBarChangeListener(
@@ -106,6 +123,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     keepScreenOnStatus.addListener(keepScreenOnStatusListener)
     changeScreenBrightnessStatus.addListener(changeScreenBrightnessStatusListener)
     floatingLockViewSizeStatus.addListener(floatingLockViewSizeStatusListener)
+    shouldRequestAddTileServiceStatus.addListener(shouldRequestAddTileServiceStatusListener)
   }
 
   override fun onDestroy() {
@@ -114,6 +132,7 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
     keepScreenOnStatus.removeListener(keepScreenOnStatusListener)
     changeScreenBrightnessStatus.removeListener(changeScreenBrightnessStatusListener)
     floatingLockViewSizeStatus.removeListener(floatingLockViewSizeStatusListener)
+    shouldRequestAddTileServiceStatus.removeListener(shouldRequestAddTileServiceStatusListener)
   }
 
   override fun onFloatingViewAdded() {
@@ -258,6 +277,17 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
       floatingLockViewSizeSeekBarListener
     )
   }
+
+  private val shouldRequestAddTileServiceStatusListener =
+    object : ShouldRequestAddTileServiceStatus.Listener {
+      override fun update(shouldRequest: Boolean) {
+        requestAddTileServiceButton.visibility = if (shouldRequest) {
+          View.VISIBLE
+        } else {
+          View.GONE
+        }
+      }
+    }
 
   override fun onResume() {
     super.onResume()
