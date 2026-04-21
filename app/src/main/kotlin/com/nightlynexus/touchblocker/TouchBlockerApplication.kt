@@ -46,5 +46,7 @@ class TouchBlockerApplication : Application() {
       }
     })
     featureUnlocker.startConnection()
+
+    updateTileService(this)
   }
 }

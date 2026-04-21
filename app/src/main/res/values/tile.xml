@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="tile_label">Touch Blocker</string>
+  <string name="tile_subtitle_grant_permission">Grant Permission</string>
+</resources>
