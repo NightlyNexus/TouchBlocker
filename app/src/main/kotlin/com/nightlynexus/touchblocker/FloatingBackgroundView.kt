@@ -52,8 +52,8 @@ internal class FloatingBackgroundView(
       )
       // Gesture navigation arrived in SDK version 29.
       // Checking the left and right insets is probably good enough to detect gesture navigation.
-      // If this check guesses incorrectly, hiding the navigation bar is not a heavy price to pay
-      // for being wrong.
+      // If this check guesses incorrectly, hiding the navigation bar or not hiding the gesture
+      // navigation is not a heavy price to pay for being wrong.
       setHideNavigation(SDK_INT >= 29 && (systemGestures.left != 0 || systemGestures.right != 0))
       insets
     }
