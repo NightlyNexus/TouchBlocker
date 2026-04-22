@@ -565,8 +565,8 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
       windowManager.updateViewLayout(lockView, lockViewLayoutParams)
     }
 
-    // If we switched between gesture navigation, backgroundView needs to know to set its
-    // system ui flags.
+    // If we switched between gesture navigation and the button navigation bar, backgroundView needs
+    // to set its system ui flags.
     backgroundView.requestApplyInsets()
   }
 
