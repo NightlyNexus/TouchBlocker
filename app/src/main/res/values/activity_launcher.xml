@@ -43,4 +43,6 @@
   <color name="request_add_tile_service_button_background_tint">#222266</color>
   <color name="request_add_tile_service_button_ripple">@color/window_background</color>
   <color name="request_add_tile_service_button_text">#FFFFFF</color>
+
+  <dimen name="root_padding_vertical">16dp</dimen>
 </resources>

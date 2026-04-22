@@ -16,6 +16,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import com.nightlynexus.featureunlocker.FeatureUnlocker
@@ -175,6 +178,49 @@ class LauncherActivity :
         footerView.visibility = View.GONE
       }
     }
+
+    ViewCompat.setOnApplyWindowInsetsListener(rootView) { _, insets ->
+      val systemBarsAndCutout = insets.getInsets(
+        WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+      )
+      val paddingVertical = resources.getDimensionPixelSize(R.dimen.root_padding_vertical)
+
+      val paddingTop = systemBarsAndCutout.top + paddingVertical
+      val paddingBottom = systemBarsAndCutout.bottom + paddingVertical
+
+      val rootViewPaddingTop: Int
+      val buttonsContainerViewPaddingTop: Int
+      val rootViewPaddingBottom: Int
+      val buttonsContainerViewPaddingBottom: Int
+      if (brandIcon.isVisible) {
+        rootViewPaddingTop = paddingTop
+        buttonsContainerViewPaddingTop = 0
+      } else {
+        rootViewPaddingTop = 0
+        buttonsContainerViewPaddingTop = paddingTop
+      }
+      if (footerView.isVisible) {
+        rootViewPaddingBottom = paddingBottom
+        buttonsContainerViewPaddingBottom = 0
+      } else {
+        rootViewPaddingBottom = 0
+        buttonsContainerViewPaddingBottom = paddingBottom
+      }
+      rootView.setPadding(
+        systemBarsAndCutout.left,
+        rootViewPaddingTop,
+        systemBarsAndCutout.right,
+        rootViewPaddingBottom
+      )
+      buttonsContainerView.setPadding(
+        0,
+        buttonsContainerViewPaddingTop,
+        0,
+        buttonsContainerViewPaddingBottom
+      )
+      insets
+    }
+    rootView.requestApplyInsets()
     return true
   }
 
