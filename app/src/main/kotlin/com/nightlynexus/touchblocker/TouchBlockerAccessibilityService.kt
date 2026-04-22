@@ -564,6 +564,10 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
       windowManager.updateViewLayout(backgroundView, backgroundViewLayoutParams)
       windowManager.updateViewLayout(lockView, lockViewLayoutParams)
     }
+
+    // If we switched between gesture navigation, backgroundView needs to know to set its
+    // system ui flags.
+    backgroundView.requestApplyInsets()
   }
 
   private fun lockWidth(sizeMultiplier: Float): Int {
