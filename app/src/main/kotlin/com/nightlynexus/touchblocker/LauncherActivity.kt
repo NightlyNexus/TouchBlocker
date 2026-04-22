@@ -5,21 +5,26 @@ import android.app.AlertDialog
 import android.app.role.RoleManager
 import android.content.ComponentName
 import android.content.Intent
-import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.CompoundButton
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.marginBottom
+import androidx.core.view.marginTop
 import com.nightlynexus.featureunlocker.FeatureUnlocker
 import kotlin.math.roundToInt
 
-class LauncherActivity : Activity(), FloatingViewStatus.Listener {
+class LauncherActivity :
+  Activity(),
+  FloatingViewStatus.Listener,
+  ViewTreeObserver.OnPreDrawListener {
   private lateinit var floatingViewStatus: FloatingViewStatus
   private lateinit var keepScreenOnStatus: KeepScreenOnStatus
   private lateinit var changeScreenBrightnessStatus: ChangeScreenBrightnessStatus
@@ -27,13 +32,16 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
   private lateinit var shouldRequestAddTileServiceStatus: ShouldRequestAddTileServiceStatus
   private lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   private lateinit var featureUnlocker: FeatureUnlocker
+  private lateinit var rootView: View
   private lateinit var brandIcon: View
+  private lateinit var buttonsContainerView: View
   private lateinit var enableButton: TextView
   private lateinit var keepScreenOnCheckBox: CompoundButton
   private lateinit var changeScreenBrightnessCheckBox: CompoundButton
   private lateinit var assistantCheckBox: CompoundButton
   private lateinit var requestAddTileServiceButton: View
   private lateinit var floatingLockViewSizeSeekBar: SeekBar
+  private lateinit var footerView: View
   private var permissionDialog: AlertDialog? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,24 +58,26 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
 
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_launcher)
+    rootView = findViewById(R.id.root)
     brandIcon = findViewById(R.id.brand_icon)
     enableButton = findViewById(R.id.enable)
+    buttonsContainerView = findViewById(R.id.buttons_container)
     keepScreenOnCheckBox = findViewById(R.id.keep_screen_on)
     changeScreenBrightnessCheckBox = findViewById(R.id.change_screen_brightness)
     assistantCheckBox = findViewById(R.id.enable_assistant)
     requestAddTileServiceButton = findViewById(R.id.request_add_tile_service)
     floatingLockViewSizeSeekBar = findViewById(R.id.floating_lock_view_size)
+    floatingLockViewSizeSeekBar = findViewById(R.id.floating_lock_view_size)
+    footerView = findViewById(R.id.footer)
+
+    rootView.viewTreeObserver.addOnPreDrawListener(this)
+
     if (floatingViewStatus.added) {
       onFloatingViewAdded()
     } else if (floatingViewStatus.permissionGranted) {
       onFloatingViewRemoved()
     } else {
       onFloatingViewPermissionRevoked()
-    }
-    brandIcon.visibility = if (resources.configuration.orientation == ORIENTATION_PORTRAIT) {
-      View.VISIBLE
-    } else {
-      View.GONE
     }
 
     keepScreenOnCheckBox.isChecked =
@@ -131,12 +141,41 @@ class LauncherActivity : Activity(), FloatingViewStatus.Listener {
 
   override fun onDestroy() {
     super.onDestroy()
+    rootView.viewTreeObserver.removeOnPreDrawListener(this)
     permissionDialog?.dismiss()
     floatingViewStatus.removeListener(this)
     keepScreenOnStatus.removeListener(keepScreenOnStatusListener)
     changeScreenBrightnessStatus.removeListener(changeScreenBrightnessStatusListener)
     floatingLockViewSizeStatus.removeListener(floatingLockViewSizeStatusListener)
     shouldRequestAddTileServiceStatus.removeListener(shouldRequestAddTileServiceStatusListener)
+  }
+
+  override fun onPreDraw(): Boolean {
+    val rootViewHeight = rootView.height - rootView.paddingTop - rootView.paddingBottom
+    val brandIconHeight = brandIcon.minimumHeight +
+      brandIcon.marginTop + brandIcon.marginBottom
+    val buttonsContainerViewHeight = buttonsContainerView.height +
+      buttonsContainerView.marginTop + buttonsContainerView.marginBottom
+    val footerViewHeight = footerView.height +
+      footerView.marginTop + footerView.marginBottom
+
+    val buttonsContainerViewAndBrandIconHeight = buttonsContainerViewHeight + brandIconHeight
+    if (buttonsContainerViewAndBrandIconHeight <= rootViewHeight) {
+      brandIcon.visibility = View.VISIBLE
+      if (buttonsContainerViewAndBrandIconHeight + footerViewHeight <= rootViewHeight) {
+        footerView.visibility = View.VISIBLE
+      } else {
+        footerView.visibility = View.GONE
+      }
+    } else {
+      brandIcon.visibility = View.GONE
+      if (buttonsContainerViewHeight + footerViewHeight <= rootViewHeight) {
+        footerView.visibility = View.VISIBLE
+      } else {
+        footerView.visibility = View.GONE
+      }
+    }
+    return true
   }
 
   override fun onFloatingViewAdded() {
