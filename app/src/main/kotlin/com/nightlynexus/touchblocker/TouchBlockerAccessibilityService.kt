@@ -323,9 +323,6 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
       val bounds = currentWindowMetrics.bounds
       width = bounds.width()
       height = bounds.height()
-      val insets = currentWindowMetrics.windowInsets.getInsets(
-        WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout()
-      )
     } else {
       @Suppress("deprecation") val display = windowManager.defaultDisplay
       val displaySize = Point()
