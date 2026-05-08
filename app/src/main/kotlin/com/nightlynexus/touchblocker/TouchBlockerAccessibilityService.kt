@@ -555,7 +555,11 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
     val maxX = width - lockWidth + maxOutOfScreenBounds
     val maxY = height - lockHeight + maxOutOfScreenBounds
 
-    lockView.reset(minX, (height - lockHeight) / 2, minX, minY, maxX, maxY)
+    val x = (lockViewLayoutParams.x * (maxX - minX) / (lockView.maxX - lockView.minX).toFloat())
+      .roundToInt()
+    val y = (lockViewLayoutParams.y * (maxY - minY) / (lockView.maxY - lockView.minY).toFloat())
+      .roundToInt()
+    lockView.reset(x, y, minX, minY, maxX, maxY)
 
     if (floatingViewStatus.added) {
       windowManager.updateViewLayout(backgroundView, backgroundViewLayoutParams)
