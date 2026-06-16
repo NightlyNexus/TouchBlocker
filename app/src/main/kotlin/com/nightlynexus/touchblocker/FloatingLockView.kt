@@ -73,6 +73,9 @@ internal class FloatingLockView(
       setImageResource(R.drawable.lock_open_right_24px)
       contentDescription = context.getText(R.string.lock_content_description_unlocked)
       this.locked = false
+      // The ACTION_DOWN touch event calls fadeIn() which calls cancelTimerToFadeOut(),
+      // but fadeIn() then calls setTimerToFadeOut() if alpha is still at 1f.
+      cancelTimerToFadeOut()
     }
   }
 
@@ -142,7 +145,7 @@ internal class FloatingLockView(
     invalidate()
   }
 
-  fun fadeOut() {
+  private fun fadeOut() {
     val alpha = alpha
     if (alpha == 0f) {
       return
