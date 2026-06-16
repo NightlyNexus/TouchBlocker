@@ -7,7 +7,6 @@ def versionPatch = 5
 def versionBuild = 0
 
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 
 android {
   namespace 'com.nightlynexus.touchblocker'
@@ -61,11 +60,15 @@ android {
     }
   }
 
-  applicationVariants.configureEach { variant ->
-    variant.outputs.configureEach { output ->
-      outputFileName = "Touch Blocker ${variant.versionCode}.apk"
-      if (variant.flavorName == 'internal') {
-        outputFileName = 'Internal ' + outputFileName
+  androidComponents {
+    onVariants(selector().all()) { variant ->
+      variant.outputs.forEach { output ->
+        def versionCode = output.versionCode.get()
+        def outputFileName = "Touch Blocker ${versionCode}.apk"
+        if (variant.flavorName == 'internal') {
+          outputFileName = 'Internal ' + outputFileName
+        }
+        output.outputFileName.set(outputFileName)
       }
     }
   }

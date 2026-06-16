@@ -1,6 +1,6 @@
 buildscript {
   ext.versions = [
-      androidGradlePlugin: '8.13.2',
+      androidGradlePlugin: '9.2.1',
       androidx: [
           activity: '1.13.0',
           annotations: '1.10.0',
@@ -20,13 +20,13 @@ buildscript {
       ],
       billing: '7.1.1',
       coil: '3.4.0',
-      compileSdk: 36,
+      compileSdk: 37,
       coroutines: '1.10.2',
       dagger: '2.59.2',
       demomode: '0.8.1',
-      diskcrashreporter: '0.3.0',
+      diskcrashreporter: '0.3.1',
       junit: '4.13.2',
-      kotlin: '2.3.20',
+      kotlin: '2.4.0',
       kotlinIo: '0.9.0',
       kotlinPoet: '2.2.0',
       kotlinSerialization: '1.10.0',
@@ -157,8 +157,8 @@ allprojects {
   }
 
   afterEvaluate { project ->
-    project.configurations.all {
-      resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+    project.configurations.configureEach { configuration ->
+      resolutionStrategy.eachDependency { details ->
         def requested = details.requested
         if (requested.version.endsWith('+')) {
           throw new GradleException(
