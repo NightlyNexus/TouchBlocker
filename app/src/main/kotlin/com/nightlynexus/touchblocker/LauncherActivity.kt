@@ -9,25 +9,18 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
-import android.view.ViewTreeObserver
 import android.widget.CompoundButton
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
-import androidx.core.view.marginBottom
-import androidx.core.view.marginTop
 import com.nightlynexus.featureunlocker.FeatureUnlocker
 import kotlin.math.roundToInt
 
 class LauncherActivity :
   Activity(),
-  FloatingViewStatus.Listener,
-  ViewTreeObserver.OnPreDrawListener {
+  FloatingViewStatus.Listener {
   private lateinit var floatingViewStatus: FloatingViewStatus
   private lateinit var keepScreenOnStatus: KeepScreenOnStatus
   private lateinit var changeScreenBrightnessStatus: ChangeScreenBrightnessStatus
@@ -35,7 +28,6 @@ class LauncherActivity :
   private lateinit var shouldRequestAddTileServiceStatus: ShouldRequestAddTileServiceStatus
   private lateinit var accessibilityPermissionRequestTracker: AccessibilityPermissionRequestTracker
   private lateinit var featureUnlocker: FeatureUnlocker
-  private lateinit var rootView: View
   private lateinit var brandIcon: View
   private lateinit var buttonsContainerView: View
   private lateinit var enableButton: TextView
@@ -61,7 +53,6 @@ class LauncherActivity :
 
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_launcher)
-    rootView = findViewById(R.id.root)
     brandIcon = findViewById(R.id.brand_icon)
     enableButton = findViewById(R.id.enable)
     buttonsContainerView = findViewById(R.id.buttons_container)
@@ -72,8 +63,6 @@ class LauncherActivity :
     floatingLockViewSizeSeekBar = findViewById(R.id.floating_lock_view_size)
     floatingLockViewSizeSeekBar = findViewById(R.id.floating_lock_view_size)
     footerView = findViewById(R.id.footer)
-
-    rootView.viewTreeObserver.addOnPreDrawListener(this)
 
     if (floatingViewStatus.added) {
       onFloatingViewAdded()
@@ -144,84 +133,12 @@ class LauncherActivity :
 
   override fun onDestroy() {
     super.onDestroy()
-    rootView.viewTreeObserver.removeOnPreDrawListener(this)
     permissionDialog?.dismiss()
     floatingViewStatus.removeListener(this)
     keepScreenOnStatus.removeListener(keepScreenOnStatusListener)
     changeScreenBrightnessStatus.removeListener(changeScreenBrightnessStatusListener)
     floatingLockViewSizeStatus.removeListener(floatingLockViewSizeStatusListener)
     shouldRequestAddTileServiceStatus.removeListener(shouldRequestAddTileServiceStatusListener)
-  }
-
-  override fun onPreDraw(): Boolean {
-    val rootViewHeight = rootView.height - rootView.paddingTop - rootView.paddingBottom
-    val brandIconHeight = brandIcon.minimumHeight +
-      brandIcon.marginTop + brandIcon.marginBottom
-    val buttonsContainerViewHeight = buttonsContainerView.height +
-      buttonsContainerView.marginTop + buttonsContainerView.marginBottom
-    val footerViewHeight = footerView.height +
-      footerView.marginTop + footerView.marginBottom
-
-    val buttonsContainerViewAndBrandIconHeight = buttonsContainerViewHeight + brandIconHeight
-    if (buttonsContainerViewAndBrandIconHeight <= rootViewHeight) {
-      brandIcon.visibility = View.VISIBLE
-      if (buttonsContainerViewAndBrandIconHeight + footerViewHeight <= rootViewHeight) {
-        footerView.visibility = View.VISIBLE
-      } else {
-        footerView.visibility = View.GONE
-      }
-    } else {
-      brandIcon.visibility = View.GONE
-      if (buttonsContainerViewHeight + footerViewHeight <= rootViewHeight) {
-        footerView.visibility = View.VISIBLE
-      } else {
-        footerView.visibility = View.GONE
-      }
-    }
-
-    ViewCompat.setOnApplyWindowInsetsListener(rootView) { _, insets ->
-      val systemBarsAndCutout = insets.getInsets(
-        WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
-      )
-      val paddingVertical = resources.getDimensionPixelSize(R.dimen.root_padding_vertical)
-
-      val paddingTop = systemBarsAndCutout.top + paddingVertical
-      val paddingBottom = systemBarsAndCutout.bottom + paddingVertical
-
-      val rootViewPaddingTop: Int
-      val buttonsContainerViewPaddingTop: Int
-      val rootViewPaddingBottom: Int
-      val buttonsContainerViewPaddingBottom: Int
-      if (brandIcon.isVisible) {
-        rootViewPaddingTop = paddingTop
-        buttonsContainerViewPaddingTop = 0
-      } else {
-        rootViewPaddingTop = 0
-        buttonsContainerViewPaddingTop = paddingTop
-      }
-      if (footerView.isVisible) {
-        rootViewPaddingBottom = paddingBottom
-        buttonsContainerViewPaddingBottom = 0
-      } else {
-        rootViewPaddingBottom = 0
-        buttonsContainerViewPaddingBottom = paddingBottom
-      }
-      rootView.setPadding(
-        systemBarsAndCutout.left,
-        rootViewPaddingTop,
-        systemBarsAndCutout.right,
-        rootViewPaddingBottom
-      )
-      buttonsContainerView.setPadding(
-        0,
-        buttonsContainerViewPaddingTop,
-        0,
-        buttonsContainerViewPaddingBottom
-      )
-      insets
-    }
-    rootView.requestApplyInsets()
-    return true
   }
 
   override fun onFloatingViewAdded() {
