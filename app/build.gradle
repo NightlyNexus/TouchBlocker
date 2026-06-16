@@ -52,8 +52,9 @@ android {
     flavorDimensions = ['environment']
 
     internal {
+      def gitCommitSha = 'git rev-parse --short HEAD'.execute().text.trim()
       applicationIdSuffix '.internal'
-      versionNameSuffix '-internal'
+      versionNameSuffix "-internal-${gitCommitSha}"
     }
 
     production {
