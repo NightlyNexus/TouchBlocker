@@ -168,7 +168,11 @@ internal class PlayFeatureUnlocker(
           }
           true
         } else {
-          false
+          // Keep loading and wait for the update in purchasesUpdatedListener.
+          withContext(Dispatchers.Main) {
+            state = FeatureUnlocker.State.Loading
+          }
+          true
         }
       }
     } else {
