@@ -139,6 +139,8 @@ class TouchBlockerAccessibilityService : AccessibilityService(), FloatingViewSta
       WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
         WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
         WindowManager.LayoutParams.FLAG_FULLSCREEN,
+      // FLAG_NOT_FOCUSABLE allows controller input but allows system gestures like swiping down
+      // the notification shade to pass through, so do not use it.
       PixelFormat.TRANSLUCENT
     )
     if (keepScreenOnStatus.getKeepScreenOn()) {
